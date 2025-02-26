@@ -1,0 +1,28 @@
+📦 Projet
+├── 📂 API
+│   ├── 📂 Controllers
+│   ├── 📂 Models
+│   ├── 📂 Configs (optionnel)
+│   ├── 📂 Utils (optionnel)
+│
+├── 📂 BLL (Business Logic Layer)
+│   ├── 📂 Services
+│   ├── 📂 Models (optionnel)
+│   ├── 📂 Utils (optionnel)
+│
+├── 📂 DAL (Data Access Layer)
+│   ├── 📂 Repositories
+│   ├── 📂 Entities (optionnel)
+│   ├── 📂 Utils (optionnel)
+│
+├── 📂 DL (Domain Layer)
+│   ├── 📂 Entities
+│   ├── 📂 Enums
+│
+├── 📂 IL (Infrastructure Layer)
+│   ├── 📂 Configs
+│   ├── 📂 Utils
+│
+
+🔗 Dépendances :
+DL & IL  --->  DAL  --->  BLL  --->  API
