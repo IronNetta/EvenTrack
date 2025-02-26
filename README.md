@@ -6,8 +6,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 ## Fonctionnalités principales
 
 ### 1. Gestion des utilisateurs
-✅ Inscription et connexion avec **Spring Security + JWT**
-✅ Rôles : **Admin, Organisateur, Participant**
+-✅ Inscription et connexion avec **Spring Security + JWT**
+-✅ Rôles : **Admin, Organisateur, Participant**
 - Mise à jour du profil utilisateur
 
 ### 2. Gestion des événements
