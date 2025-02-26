@@ -1,7 +1,11 @@
 package org.seba.eventrack.bll.services.impls;
 
+import com.paypal.api.payments.Payment;
+import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.services.TicketService;
+import org.seba.eventrack.bll.services.payment.PaymentService;
+import org.seba.eventrack.bll.services.qrCode.QRCodeService;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.Ticket;
 import org.seba.eventrack.dl.entities.User;
@@ -26,6 +30,8 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final PaymentService paymentService;
+    private final QRCodeService qrCodeService;
 
     @Override
     public Page<Ticket> findAll(List<SearchParam<Ticket>> searchParams, Pageable pageable) {
@@ -43,7 +49,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Ticket bookTicket(Long eventId, Long userId) {
+    public String bookTicket(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         User user = userRepository.findById(userId)
@@ -53,16 +59,40 @@ public class TicketServiceImpl implements TicketService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
 
-        Ticket ticket = new Ticket();
-        ticket.setPaid(false);
-        ticket.setEvent(event);
-        ticket.setParticipant(user);
-        ticket.setQrCodeUrl("GENERATED_QR_CODE");
-        event.setReservedSeats(event.getReservedSeats() + 1);
-        eventRepository.save(event);
-        return ticketRepository.save(ticket);
+        String paymentUrl = paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
+
+        return paymentUrl;
     }
 
+    @Override
+    public Ticket confirmTicket(String paymentId) throws PayPalRESTException {
+        if (paymentService.validatePayment(paymentId)) {
+            Payment payment = Payment.get(paymentService.getAPIContext(), paymentId);
+
+            String description = payment.getTransactions().get(0).getDescription();
+            String[] parts = description.split(": ");
+            Long userId = Long.parseLong(parts[1]);
+            Long eventId = Long.parseLong(parts[3]);
+
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            Ticket ticket = new Ticket();
+            ticket.setPaid(true);
+            ticket.setEvent(event);
+            ticket.setParticipant(user);
+
+            String qrCodePath = qrCodeService.generateQrCode(ticket.getId());
+            ticket.setQrCodeUrl(qrCodePath);
+
+            event.setReservedSeats(event.getReservedSeats() + 1);
+            eventRepository.save(event);
+            return ticketRepository.save(ticket);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
+    }
     @Override
     public Ticket findById(Long id) {
         return ticketRepository.findById(id)
@@ -80,10 +110,18 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
+        if (ticket.isPaid()) {
+            boolean refunded = paymentService.refundPayment(ticket.getPaymentId());
+            if (!refunded) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refund failed");
+            }
+        }
+
         Event event = ticket.getEvent();
         event.setReservedSeats(event.getReservedSeats() - 1);
         eventRepository.save(event);
         ticketRepository.delete(ticket);
         return ticket;
     }
+
 }

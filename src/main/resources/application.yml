@@ -11,5 +11,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+stripe:
+  secretKey: sk_test_your_secret_key
+
+paypal:
+  client-id: your_paypal_client_id
+  client-secret: your_paypal_client_secret
+  mode: sandbox or live
 server:
   port: 8000

@@ -5,6 +5,7 @@ import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
 import org.seba.eventrack.dl.enums.EventType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -31,7 +32,10 @@ public class Event extends BaseEntity<Long> {
     @Column
     private String imageUrl;
 
-    @Column(nullable = false)
+    @Column
+    private Double price;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
@@ -41,4 +45,11 @@ public class Event extends BaseEntity<Long> {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Ticket> tickets;
+
+    public Event(String title, String description, LocalDateTime localDateTime, String location, int capacity) {
+        this.title = title;
+        this.description = description;
+        this.location = location;
+        this.capacity = capacity;
+    }
 }

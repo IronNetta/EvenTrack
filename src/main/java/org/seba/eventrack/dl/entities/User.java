@@ -74,6 +74,14 @@ public class User extends BaseEntity<Long> implements UserDetails {
         this.role = UserRole.PARTICIPANT;
     }
 
+    public User(String admin, String mail, String password, UserRole userRole) {
+        this();
+        this.username = admin;
+        this.email = mail;
+        this.password = password;
+        this.role = userRole;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role.toString()));

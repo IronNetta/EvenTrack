@@ -11,11 +11,14 @@ import org.seba.eventrack.dl.enums.TicketStatus;
 @EqualsAndHashCode(callSuper = true) @ToString
 public class Ticket extends BaseEntity<Long> {
 
-    @Column (unique = true, nullable = false)
+    @Column (unique = true)
     private String qrCodeUrl;
 
     @Column(nullable = false)
     private boolean isPaid;
+
+    @Column
+    private String paymentId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -28,4 +31,9 @@ public class Ticket extends BaseEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User participant;
+
+    public Ticket(User participant, Event event) {
+        this.participant = participant;
+        this.event = event;
+    }
 }

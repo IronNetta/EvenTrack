@@ -36,8 +36,14 @@ public class TicketController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('PARTICIPANT')")
     @PostMapping("/book")
-    public ResponseEntity<Ticket> bookTicket(@RequestParam Long eventId, @RequestParam Long userId) {
+    public ResponseEntity<String> bookTicket(@RequestParam Long eventId, @RequestParam Long userId) {
         return ResponseEntity.ok(ticketService.bookTicket(eventId, userId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PARTICIPANT')")
+    @GetMapping("/{id}")
+    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
+        return ResponseEntity.ok(ticketService.findById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('PARTICIPANT')")
