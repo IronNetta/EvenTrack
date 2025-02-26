@@ -8,12 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Getter @Setter
-@NoArgsConstructor @Table(name = "user_")
+@Table(name = "user_")
 @ToString(of = {"email","role"}) @EqualsAndHashCode(callSuper = true, of = {"email"})
 public class User extends BaseEntity<Long> implements UserDetails {
 
@@ -23,12 +24,25 @@ public class User extends BaseEntity<Long> implements UserDetails {
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
     private List<Event> organizedEvents;
+
+
+    public User() {
+        this.organizedEvents = new ArrayList<>();
+    }
+
+    public User(String username, String email, String password) {
+        this();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = UserRole.PARTICIPANT;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
