@@ -42,6 +42,24 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - Planification des événements
 - Affichage d'un calendrier avec les événements
 
+## Endpoints principaux (REST API)
+
+| Méthode | Endpoint                  | Description                             |
+|---------|---------------------------|-----------------------------------------|
+| POST    | `/auth/register`          | Inscription d’un utilisateur            |
+| POST    | `/auth/login`             | Connexion et récupération du token      |
+| GET     | `/events`                 | Lister tous les événements              |
+| GET     | `/events/{id}`            | Récupérer un événement spécifique       |
+| POST    | `/events`                 | Créer un événement (organisateur)       |
+| PUT     | `/events/{id}`            | Modifier un événement                   |
+| DELETE  | `/events/{id}`            | Supprimer un événement                  |
+| POST    | `/events/{id}/reserve`    | Réserver un billet                      |
+| GET     | `/users/{id}/tickets`     | Voir les billets d’un utilisateur       |
+| DELETE  | `/tickets/{id}`           | Annuler une réservation                 |
+| POST    | `/events/{id}/approve`    | Approuver un événement (admin)          |
+| POST    | `/events/{id}/reject`     | Refuser un événement (admin)            |
+
+
 ## Installation
 ### Prérequis
 - **Java 17+**
