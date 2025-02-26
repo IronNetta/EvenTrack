@@ -3,11 +3,15 @@ package org.seba.eventrack.dl.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
+import org.seba.eventrack.dl.enums.NotificationPreference;
+import org.seba.eventrack.dl.enums.PaymentMethod;
 import org.seba.eventrack.dl.enums.UserRole;
+import org.seba.eventrack.dl.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,17 +24,43 @@ public class User extends BaseEntity<Long> implements UserDetails {
 
     @Column(unique = true, nullable = false, length = 50)
     private String username;
+
     @Column(unique = true, nullable = false, length = 250)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Column
+    private String phoneNumber;
+
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationPreference notificationPreferences = NotificationPreference.EMAIL;
+
+    @Column
+    private LocalDateTime lastLogin;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Column
+    private String profileImageUrl;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod preferredPaymentMethod = PaymentMethod.NONE;
+
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
     private List<Event> organizedEvents;
-
 
     public User() {
         this.organizedEvents = new ArrayList<>();
@@ -71,6 +101,6 @@ public class User extends BaseEntity<Long> implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.status == UserStatus.ACTIVE;
     }
 }

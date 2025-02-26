@@ -3,15 +3,23 @@ package org.seba.eventrack.dl.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
+import org.seba.eventrack.dl.enums.TicketStatus;
+
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true) @ToString
 public class Ticket extends BaseEntity<Long> {
+
     @Column (unique = true, nullable = false)
     private String qrCodeUrl;
+
     @Column(nullable = false)
     private boolean isPaid;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TicketStatus status = TicketStatus.AVAILABLE;
 
     @ManyToOne
     @JoinColumn(name = "event_id")

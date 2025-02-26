@@ -3,6 +3,7 @@ package org.seba.eventrack.dl.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
+import org.seba.eventrack.dl.enums.EventType;
 
 import java.util.List;
 
@@ -14,16 +15,25 @@ public class Event extends BaseEntity<Long> {
 
     @Column(nullable = false)
     private String title;
+
     @Column
     private String description;
+
     @Column(nullable = false)
     private String location;
+
     @Column(nullable = false)
     private int capacity;
+
     @Column(nullable = false)
     private int reservedSeats;
+
     @Column
     private String imageUrl;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     @ManyToOne
     @JoinColumn(name = "organizer_id")
