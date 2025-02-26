@@ -6,8 +6,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 ## Fonctionnalités principales
 
 ### 1. Gestion des utilisateurs
-- Inscription et connexion avec **Spring Security + JWT**
-- Rôles : **Admin, Organisateur, Participant**
+✅ Inscription et connexion avec **Spring Security + JWT**
+✅ Rôles : **Admin, Organisateur, Participant**
 - Mise à jour du profil utilisateur
 
 ### 2. Gestion des événements
@@ -57,12 +57,23 @@ mvn clean install
 ```
 
 ### Configuration
-Modifier le fichier **application.properties** avec vos propres valeurs :
+Modifier le fichier **application.yml** avec vos propres valeurs :
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/eventflow
-spring.datasource.username=root
-spring.datasource.password=yourpassword
-spring.security.jwt.secret=your_secret_key
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/eventrack
+    username: Username
+    password: Password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8080
 ```
 
 ## Lancement
