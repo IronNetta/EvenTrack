@@ -1,7 +1,7 @@
 # EvenTrack API
 
 ## Description
-EventFlow est une API REST permettant la gestion complète d'événements avec gestion des utilisateurs, des rôles, des billets et des paiements en ligne. Elle est développée en **Spring Boot** et utilise **JWT** pour l'authentification.
+EvenTrack est une API REST permettant la gestion complète d'événements avec gestion des utilisateurs, des rôles, des billets et des paiements en ligne. Elle est développée en **Spring Boot** et utilise **JWT** pour l'authentification.
 
 ## Fonctionnalités principales
 
