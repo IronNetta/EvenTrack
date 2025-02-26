@@ -12,17 +12,18 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 
 ### 2. Gestion des événements
 - ✅ CRUD sur les événements (titre, description, date, lieu, capacité)
-- ✅Catégorisation des événements (concert, conférence, sport, etc.)
-- Ajout d'une image de couverture
+- ✅ Catégorisation des événements (concert, conférence, sport, etc.)
+- ✅ Ajout d'une image de couverture
 
 ### 3. Réservation et gestion des billets
-- Réservation d'un billet pour un événement
-- Limitation du nombre de places disponibles
-- Génération d'un **QR code** pour le billet
-- Annulation d'une réservation
+- ✅ Réservation d'un billet pour un événement
+- ✅ Limitation du nombre de places disponibles
+- ✅ Génération d'un **QR code** pour le billet
+- ✅ Annulation d'une réservation
 
-### 4. Paiement en ligne (optionnel)
-- Intégration avec **Stripe** ou **PayPal**
+### 4. Paiement en ligne
+- ✅ Intégration avec **Stripe** 
+- Intégration avec **PayPal**
 - Gestion des remboursements
 
 ### 5. Notifications et rappels
