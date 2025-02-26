@@ -11,8 +11,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - ✅ Mise à jour du profil utilisateur
 
 ### 2. Gestion des événements
-- CRUD sur les événements (titre, description, date, lieu, capacité)
-- Catégorisation des événements (concert, conférence, sport, etc.)
+- ✅ CRUD sur les événements (titre, description, date, lieu, capacité)
+- ✅Catégorisation des événements (concert, conférence, sport, etc.)
 - Ajout d'une image de couverture
 
 ### 3. Réservation et gestion des billets

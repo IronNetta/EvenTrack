@@ -12,13 +12,13 @@ import java.util.List;
 
 public interface EventService {
 
-    public Page<Event> findAll(List<SearchParam<Event>> searchParams, Pageable pageable);
+    Page<Event> findAll(List<SearchParam<Event>> searchParams, Pageable pageable);
 
-    public Event save(Event event);
+    Event save(Event event);
 
-    public Event findById(Long id);
+    Event findById(Long id);
 
-    public Event update(Event event);
+    Event update(Event event);
 
-    public void deleteById(Long id);
+    void deleteById(Long id);
 }

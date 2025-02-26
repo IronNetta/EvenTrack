@@ -2,8 +2,12 @@ package org.seba.eventrack.bll.services.impls;
 
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.services.TicketService;
+import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.Ticket;
+import org.seba.eventrack.dl.entities.User;
+import org.seba.eventrack.dal.repositories.EventRepository;
 import org.seba.eventrack.dal.repositories.TicketRepository;
+import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.seba.eventrack.il.specification.SearchSpecification;
 import org.springframework.data.domain.Page;
@@ -14,13 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Page<Ticket> findAll(List<SearchParam<Ticket>> searchParams, Pageable pageable) {
@@ -38,7 +43,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Ticket save(Ticket ticket) {
+    public Ticket bookTicket(Long eventId, Long userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (event.getReservedSeats() >= event.getCapacity()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
+        }
+
+        Ticket ticket = new Ticket();
+        ticket.setPaid(false);
+        ticket.setEvent(event);
+        ticket.setParticipant(user);
+        ticket.setQrCodeUrl("GENERATED_QR_CODE");
+        event.setReservedSeats(event.getReservedSeats() + 1);
+        eventRepository.save(event);
         return ticketRepository.save(ticket);
     }
 
@@ -55,24 +76,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Ticket update(Ticket ticket) {
-        Optional<Ticket> existingTicket = ticketRepository.findById(ticket.getId());
-        if (existingTicket.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found");
-        }
-        Ticket updatedTicket = existingTicket.get();
-        updatedTicket.setQrCodeUrl(ticket.getQrCodeUrl());
-        updatedTicket.setPaid(ticket.isPaid());
-        updatedTicket.setEvent(ticket.getEvent());
-        updatedTicket.setParticipant(ticket.getParticipant());
-        return ticketRepository.save(updatedTicket);
-    }
+    public Ticket cancelTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
-    @Override
-    public void deleteById(Long id) {
-        if (!ticketRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found");
-        }
-        ticketRepository.deleteById(id);
+        Event event = ticket.getEvent();
+        event.setReservedSeats(event.getReservedSeats() - 1);
+        eventRepository.save(event);
+        ticketRepository.delete(ticket);
+        return ticket;
     }
 }
