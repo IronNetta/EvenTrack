@@ -1,40 +1,33 @@
-/*package org.seba.eventrack.bll.services.payment.impl;
+package org.seba.eventrack.bll.services.payment.impl;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 
 import lombok.RequiredArgsConstructor;
+import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
 import org.seba.eventrack.bll.services.payment.PaymentService;
-import org.seba.eventrack.dl.entities.Ticket;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service("paypal")
 @RequiredArgsConstructor
 public class PayPalPaymentServiceImpl implements PaymentService {
 
-    @Value("${paypal.clientId}")
-    private String clientId;
-
-    @Value("${paypal.clientSecret}")
-    private String clientSecret;
-
-    @Value("${paypal.mode}")
-    private String mode;
-
-    public APIContext getAPIContext() {
-        return new APIContext(clientId, clientSecret, mode);
-    }
+    private final PaypalConfiguration paypalConfiguration;
 
     @Override
     public String createPayment(Double amount, String currency, Long userId, Long eventId) {
         Amount paymentAmount = new Amount();
         paymentAmount.setCurrency(currency);
-        paymentAmount.setTotal(String.format("%.2f", amount));
+        DecimalFormat decimalFormat = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
+        String formattedAmount = decimalFormat.format(amount);
+        paymentAmount.setTotal(formattedAmount);
 
         Transaction transaction = new Transaction();
         transaction.setAmount(paymentAmount);
@@ -52,12 +45,12 @@ public class PayPalPaymentServiceImpl implements PaymentService {
         payment.setTransactions(transactions);
 
         RedirectUrls redirectUrls = new RedirectUrls();
-        redirectUrls.setCancelUrl("http://yourapp.com/cancel");
-        redirectUrls.setReturnUrl("http://yourapp.com/success");
+        redirectUrls.setCancelUrl("http://localhost:8080/cancel");
+        redirectUrls.setReturnUrl("http://localhost:8080/success");
         payment.setRedirectUrls(redirectUrls);
 
         try {
-            APIContext apiContext = getAPIContext();
+            APIContext apiContext = paypalConfiguration.getAPIContext();
             Payment createdPayment = payment.create(apiContext);
             return createdPayment.getLinks().stream()
                     .filter(link -> "approval_url".equals(link.getRel()))
@@ -72,7 +65,7 @@ public class PayPalPaymentServiceImpl implements PaymentService {
     @Override
     public boolean validatePayment(String paymentId) {
         try {
-            APIContext apiContext = getAPIContext();
+            APIContext apiContext = paypalConfiguration.getAPIContext();
             Payment payment = Payment.get(apiContext, paymentId);
             return "approved".equalsIgnoreCase(payment.getState());
         } catch (PayPalRESTException e) {
@@ -83,7 +76,7 @@ public class PayPalPaymentServiceImpl implements PaymentService {
     @Override
     public boolean refundPayment(String paymentId) {
         try {
-            APIContext apiContext = getAPIContext();
+            APIContext apiContext = paypalConfiguration.getAPIContext();
             Sale sale = Sale.get(apiContext, paymentId);
 
             RefundRequest refundRequest = new RefundRequest();
@@ -100,4 +93,4 @@ public class PayPalPaymentServiceImpl implements PaymentService {
         }
     }
 }
-*/
+

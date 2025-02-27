@@ -10,11 +10,13 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Primary
 @Service("stripe")
 @RequiredArgsConstructor
 public class StripePaymentServiceImpl implements PaymentService {
@@ -66,8 +68,4 @@ public class StripePaymentServiceImpl implements PaymentService {
         }
     }
 
-    @Override
-    public APIContext getAPIContext() {
-        return null;
-    }
 }

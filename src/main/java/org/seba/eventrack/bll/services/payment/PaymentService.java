@@ -12,5 +12,4 @@ public interface PaymentService {
 
     boolean refundPayment(String paymentId);
 
-    APIContext getAPIContext();
 }

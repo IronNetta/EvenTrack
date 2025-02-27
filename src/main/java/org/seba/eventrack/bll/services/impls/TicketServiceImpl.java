@@ -3,6 +3,7 @@ package org.seba.eventrack.bll.services.impls;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
+import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
 import org.seba.eventrack.bll.services.TicketService;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.seba.eventrack.bll.services.qrCode.QRCodeService;
@@ -32,6 +33,7 @@ public class TicketServiceImpl implements TicketService {
     private final UserRepository userRepository;
     private final PaymentService paymentService;
     private final QRCodeService qrCodeService;
+    private final PaypalConfiguration paypalConfiguration;
 
     @Override
     public Page<Ticket> findAll(List<SearchParam<Ticket>> searchParams, Pageable pageable) {
@@ -59,15 +61,13 @@ public class TicketServiceImpl implements TicketService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
 
-        String paymentUrl = paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
-
-        return paymentUrl;
+        return paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
     }
 
     @Override
     public Ticket confirmTicket(String paymentId) throws PayPalRESTException {
         if (paymentService.validatePayment(paymentId)) {
-            Payment payment = Payment.get(paymentService.getAPIContext(), paymentId);
+            Payment payment = Payment.get(paypalConfiguration.getAPIContext(), paymentId);
 
             String description = payment.getTransactions().get(0).getDescription();
             String[] parts = description.split(": ");
