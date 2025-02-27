@@ -9,6 +9,8 @@ import org.seba.eventrack.dl.entities.Ticket;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dl.enums.UserRole;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,25 +22,31 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final TicketRepository ticketRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(UserRepository userRepository, EventRepository eventRepository, TicketRepository ticketRepository) {
+
+    public DataInitializer(UserRepository userRepository, EventRepository eventRepository, TicketRepository ticketRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.ticketRepository = ticketRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+
         loadUsers();
         loadEvents();
         loadTickets();
     }
 
+
     private void loadUsers() {
         if (userRepository.count() == 0) {
-            User admin = new User("admin", "admin@email.com", "password", UserRole.ADMIN);
-            User organizer = new User("organizer", "organizer@email.com", "password", UserRole.ORGANIZER);
-            User participant = new User("participant", "participant@email.com", "password", UserRole.PARTICIPANT);
+            String password = passwordEncoder.encode("password");
+            User admin = new User("admin", "admin@email.com", password, UserRole.ADMIN);
+            User organizer = new User("organizer", "organizer@email.com", password, UserRole.ORGANIZER);
+            User participant = new User("participant", "participant@email.com", password, UserRole.PARTICIPANT);
 
             userRepository.saveAll(List.of(admin, organizer, participant));
         }

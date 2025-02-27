@@ -18,7 +18,7 @@ public class QRCodeService {
     public String generateQrCode(Long ticketId) {
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode("https://monapp.com/tickets/" + ticketId, BarcodeFormat.QR_CODE, 200, 200);
+            BitMatrix bitMatrix = qrCodeWriter.encode("https://localhost:8080/tickets/" + ticketId, BarcodeFormat.QR_CODE, 200, 200);
 
             Path qrCodePath = Path.of("qrcodes/ticket_" + ticketId + ".png");
             Files.createDirectories(qrCodePath.getParent());
