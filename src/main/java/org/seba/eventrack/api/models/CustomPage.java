@@ -7,4 +7,5 @@ public record CustomPage<T>(
         int totalPages,
         int currentPage
 ) {
+
 }
