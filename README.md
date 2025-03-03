@@ -27,8 +27,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - ✅ Gestion des remboursements
 
 ### 5. Notifications et rappels
-- Envoi d'un email de confirmation après réservation
-- Rappel automatique par **email/SMS** avant l'événement
+- ✅ Envoi d'un email de confirmation après réservation
+- ✅ Rappel automatique par **email/SMS** avant l'événement
 
 ### 6. Modération et gestion des événements
 - Validation ou refus d'un événement par un admin

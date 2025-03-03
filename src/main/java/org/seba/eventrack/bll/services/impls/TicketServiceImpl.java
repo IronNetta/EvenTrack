@@ -92,24 +92,8 @@ public class TicketServiceImpl implements TicketService {
 
             event.setReservedSeats(event.getReservedSeats() + 1);
             eventRepository.save(event);
-            String emailContent = String.format("""
-                    Bonjour %s,
-                    
-                    Votre ticket pour l’événement **%s** a bien été réservé ! 🎟️
-                    
-                    📍 **Lieu** : %s
-                    📅 **Date** : %s
-                    💰 **Prix** : %.2f USD
-                    🔗 **QR Code** : %s
-                    
-                    Présentez ce QR Code à l’entrée pour accéder à l’événement.
-                    
-                    Merci et à bientôt !
-                    L’équipe %s
-                    """,
-                    user.getUsername(), event.getTitle(), event.getLocation(), event.getDate(), event.getPrice(), qrCodePath, event.getOrganizer());
 
-            emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Confirmation de réservation", emailContent));
+            emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
             return ticketRepository.save(ticket);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
