@@ -25,6 +25,7 @@ public class EventController {
 
     private final EventService eventService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<CustomPage<EventDto>> getAllEvents(
             @RequestParam Map<String, String> params,
@@ -43,22 +44,25 @@ public class EventController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.findById(id));
     }
 
-
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
         return ResponseEntity.ok(eventService.save(event));
     }
 
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
         return ResponseEntity.ok(eventService.update(event));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
@@ -66,6 +70,7 @@ public class EventController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/accept")
     public ResponseEntity<Event> acceptEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
         return ResponseEntity.ok(eventService.validateEvent(event, user));

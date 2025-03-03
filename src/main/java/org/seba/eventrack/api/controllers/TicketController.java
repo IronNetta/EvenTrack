@@ -23,6 +23,7 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<CustomPage<TicketDto>> getAllTickets(
             @RequestParam Map<String, String> params,
@@ -40,16 +41,19 @@ public class TicketController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/book")
     public ResponseEntity<String> bookTicket(@RequestParam Long eventId, @RequestParam Long userId) {
         return ResponseEntity.ok(ticketService.bookTicket(eventId, userId));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
         return ResponseEntity.ok(ticketService.findById(id));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/cancel/{id}")
     public ResponseEntity<Void> cancelTicket(@PathVariable Long id) {
         ticketService.cancelTicket(id);

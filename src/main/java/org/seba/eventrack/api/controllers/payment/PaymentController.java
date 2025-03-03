@@ -3,6 +3,7 @@ package org.seba.eventrack.api.controllers.payment;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -14,6 +15,7 @@ public class PaymentController {
 
     private final Map<String, PaymentService> paymentServices;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{provider}/create")
     public ResponseEntity<String> createPayment(
             @PathVariable String provider,
@@ -27,6 +29,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentUrlOrSecret);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{provider}/validate/{paymentId}")
     public ResponseEntity<Boolean> validatePayment(
             @PathVariable String provider,
@@ -37,6 +40,7 @@ public class PaymentController {
         return ResponseEntity.ok(isValid);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{provider}/refund/{paymentId}")
     public ResponseEntity<Boolean> refundPayment(
             @PathVariable String provider,
