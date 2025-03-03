@@ -76,23 +76,27 @@ mvn clean install
 ```
 
 ### Configuration
-Modifier le fichier **application.yml** avec vos propres valeurs :
+Modifier le fichier **application.properties** avec vos propres valeurs :
 ```properties
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/eventrack
-    username: Username
-    password: Password
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-server:
-  port: 8080
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventrack
+spring.datasource.username=username
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+stripe.secretKey=your_stripe_secret_key
+
+spring.mail.host=smtp_host
+spring.mail.port=your_smtp_port
+spring.mail.username=your_email
+spring.mail.password=your_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+server.port=your_port
 ```
 
 ## Lancement
