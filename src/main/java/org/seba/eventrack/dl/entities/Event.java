@@ -55,6 +55,10 @@ public class Event extends BaseEntity<Long> {
     private List<Ticket> tickets;
 
     public Event(String title, String description, LocalDateTime localDateTime, String location, int capacity) {
+        this(title, description, location, capacity);
+    }
+
+    public Event(String title, String description, String location, int capacity) {
         this.title = title;
         this.description = description;
         this.location = location;

@@ -3,6 +3,7 @@ package org.seba.eventrack.api.controllers;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
+import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.User;
@@ -67,7 +68,8 @@ public class EventController {
 
 
     @PutMapping("/{id}/accept")
-    public ResponseEntity<Event> acceptEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
+    public ResponseEntity<Event> acceptEvent(@RequestBody EventForm eventForm, @AuthenticationPrincipal User user, @PathVariable Long id) {
+        Event event = eventForm.toEvent(eventForm);
         return ResponseEntity.ok(eventService.validateEvent(event, user));
     }
 

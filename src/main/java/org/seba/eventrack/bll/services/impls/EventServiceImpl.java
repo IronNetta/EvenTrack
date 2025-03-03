@@ -89,12 +89,14 @@ public class EventServiceImpl implements EventService {
         if (!userRepository.existsById(user.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        if (!user.getRole().equals(UserRole.ADMIN)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        event.setEventStatus(EventStatus.ACCEPTED);
-        update(event);
-        return event;
+        Event updatedEvent = existingEvent.get();
+        updatedEvent.setEventStatus(EventStatus.ACCEPTED);
+        eventRepository.save(updatedEvent);
+        return updatedEvent;
     }
 
     @Override
@@ -104,9 +106,6 @@ public class EventServiceImpl implements EventService {
         }
         if (!userRepository.existsById(user.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-        if (!user.getRole().equals(UserRole.ADMIN)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
         }
         event.setEventStatus(EventStatus.REJECTED);
         update(event);
