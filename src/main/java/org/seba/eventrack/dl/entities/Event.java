@@ -3,6 +3,7 @@ package org.seba.eventrack.dl.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
+import org.seba.eventrack.dl.enums.EventStatus;
 import org.seba.eventrack.dl.enums.EventType;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,10 @@ public class Event extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private EventStatus eventStatus;
+
     @ManyToOne
     @JoinColumn(name = "organizer_id")
     private User organizer;
@@ -54,5 +59,6 @@ public class Event extends BaseEntity<Long> {
         this.description = description;
         this.location = location;
         this.capacity = capacity;
+        this.eventStatus = EventStatus.PENDING;
     }
 }

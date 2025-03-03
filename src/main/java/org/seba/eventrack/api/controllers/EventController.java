@@ -5,12 +5,14 @@ import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dl.entities.Event;
+import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -61,5 +63,17 @@ public class EventController {
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/{id}/accept")
+    public ResponseEntity<Event> acceptEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
+        return ResponseEntity.ok(eventService.validateEvent(event, user));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<Event> rejectEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
+        return ResponseEntity.ok(eventService.validateEvent(event, user));
     }
 }
