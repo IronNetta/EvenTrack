@@ -23,8 +23,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 
 ### 4. Paiement en ligne
 - ✅ Intégration avec **Stripe** 
-- Intégration avec **PayPal**
-- Gestion des remboursements
+- ✅ Intégration avec **PayPal**
+- ✅ Gestion des remboursements
 
 ### 5. Notifications et rappels
 - Envoi d'un email de confirmation après réservation
