@@ -8,6 +8,4 @@ public record CustomPage<T>(
         int currentPage
 ) {
 
-
-
 }

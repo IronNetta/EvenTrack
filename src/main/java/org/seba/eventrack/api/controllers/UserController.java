@@ -1,6 +1,7 @@
 package org.seba.eventrack.api.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.security.dtos.UserSessionDTO;
 import org.seba.eventrack.bll.services.UserService;
 import org.seba.eventrack.dl.entities.User;
@@ -22,45 +23,43 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
     @GetMapping
-    public ResponseEntity<Page<UserSessionDTO>> getAllUsers(
+    public ResponseEntity<CustomPage<UserSessionDTO>> getAllUsers(
             @RequestParam Map<String, String> params,
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "id") String sort
+            @RequestParam(required = false, defaultValue = "lastName") String sort
+
     ) {
         List<SearchParam<User>> searchParams = SearchParam.create(params);
         Page<User> users = userService.getUsers(
                 searchParams,
                 PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, sort))
         );
-        Page<UserSessionDTO> dtos = users.map(UserSessionDTO::fromUser);
-        return ResponseEntity.ok(dtos);
+        List<UserSessionDTO> dtos = users.getContent().stream()
+                .map(UserSessionDTO::fromUser)
+                .toList();
+        CustomPage<UserSessionDTO> result = new CustomPage<>(dtos,users.getTotalPages(),users.getNumber() + 1);
+        return ResponseEntity.ok(result);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #email == authentication.principal.username")
     @GetMapping("/{email}")
     public ResponseEntity<UserSessionDTO> getUserByEmail(@PathVariable String email) {
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(UserSessionDTO.fromUser(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserSessionDTO> createUser(@RequestBody User user) {
         User savedUser = userService.saveUser(user);
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @PutMapping("/{id}")
     public ResponseEntity<UserSessionDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
         User updatedUser = userService.updateUser(user);
         return ResponseEntity.ok(UserSessionDTO.fromUser(updatedUser));
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
