@@ -1,8 +1,10 @@
 package org.seba.eventrack.bll.services.security.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.seba.eventrack.api.models.mails.dtos.EmailsDTO;
 import org.seba.eventrack.bll.exceptions.user.BadCredentialsException;
 import org.seba.eventrack.bll.exceptions.user.UserNotFoundException;
+import org.seba.eventrack.bll.services.mails.EmailService;
 import org.seba.eventrack.bll.services.security.AuthService;
 import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.User;
@@ -18,6 +20,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public void register(User user) {
@@ -27,6 +30,8 @@ public class AuthServiceImpl implements AuthService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRole.PARTICIPANT);
+        //Todo creation et validation de code
+        emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Votre code de validation est le suivant", "Bienvenue sur Eventrack"));
         //Todo Handle image
         userRepository.save(user);
     }

@@ -37,6 +37,9 @@ public class Event extends BaseEntity<Long> {
     private Double price;
 
     @Column
+    private LocalDateTime date;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
