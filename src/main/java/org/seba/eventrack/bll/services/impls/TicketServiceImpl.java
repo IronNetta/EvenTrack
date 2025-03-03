@@ -4,7 +4,9 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
+import org.seba.eventrack.api.models.mails.dtos.EmailsDTO;
 import org.seba.eventrack.bll.services.TicketService;
+import org.seba.eventrack.bll.services.mails.EmailService;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.seba.eventrack.bll.services.qrCode.QRCodeService;
 import org.seba.eventrack.dl.entities.Event;
@@ -34,6 +36,7 @@ public class TicketServiceImpl implements TicketService {
     private final PaymentService paymentService;
     private final QRCodeService qrCodeService;
     private final PaypalConfiguration paypalConfiguration;
+    private final EmailService emailService;
 
     @Override
     public Page<Ticket> findAll(List<SearchParam<Ticket>> searchParams, Pageable pageable) {
@@ -89,6 +92,8 @@ public class TicketServiceImpl implements TicketService {
 
             event.setReservedSeats(event.getReservedSeats() + 1);
             eventRepository.save(event);
+
+            emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
             return ticketRepository.save(ticket);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
