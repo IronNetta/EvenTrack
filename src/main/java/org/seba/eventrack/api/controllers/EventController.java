@@ -43,25 +43,22 @@ public class EventController {
         return ResponseEntity.ok(result);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.findById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
+
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
         return ResponseEntity.ok(eventService.save(event));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and #id == authentication.principal.id)")
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
         return ResponseEntity.ok(eventService.update(event));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and #id == authentication.principal.id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
