@@ -4,7 +4,9 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
+import org.seba.eventrack.api.models.mails.dtos.EmailsDTO;
 import org.seba.eventrack.bll.services.TicketService;
+import org.seba.eventrack.bll.services.mails.EmailService;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.seba.eventrack.bll.services.qrCode.QRCodeService;
 import org.seba.eventrack.dl.entities.Event;
@@ -34,6 +36,7 @@ public class TicketServiceImpl implements TicketService {
     private final PaymentService paymentService;
     private final QRCodeService qrCodeService;
     private final PaypalConfiguration paypalConfiguration;
+    private final EmailService emailService;
 
     @Override
     public Page<Ticket> findAll(List<SearchParam<Ticket>> searchParams, Pageable pageable) {
@@ -89,6 +92,24 @@ public class TicketServiceImpl implements TicketService {
 
             event.setReservedSeats(event.getReservedSeats() + 1);
             eventRepository.save(event);
+            String emailContent = String.format("""
+                    Bonjour %s,
+                    
+                    Votre ticket pour l’événement **%s** a bien été réservé ! 🎟️
+                    
+                    📍 **Lieu** : %s
+                    📅 **Date** : %s
+                    💰 **Prix** : %.2f USD
+                    🔗 **QR Code** : %s
+                    
+                    Présentez ce QR Code à l’entrée pour accéder à l’événement.
+                    
+                    Merci et à bientôt !
+                    L’équipe %s
+                    """,
+                    user.getUsername(), event.getTitle(), event.getLocation(), event.getDate(), event.getPrice(), qrCodePath, event.getOrganizer());
+
+            emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Confirmation de réservation", emailContent));
             return ticketRepository.save(ticket);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
