@@ -32,9 +32,6 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(UserRole.PARTICIPANT);
         //Todo creation et validation de code
         emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Votre code de validation est le suivant", "Bienvenue sur Eventrack"));
-        System.out.println("Envoi de l'email à : " + user.getEmail());
-        String result = emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Votre code de validation est le suivant", "Bienvenue sur Eventrack"));
-        System.out.println("Résultat de l'envoi : " + result);
         //Todo Handle image
         userRepository.save(user);
     }
