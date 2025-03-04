@@ -1,5 +1,7 @@
 package org.seba.eventrack.bll.services;
 
+import org.seba.eventrack.api.models.event.dtos.EventDto;
+import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
@@ -23,7 +25,7 @@ public interface EventService {
 
     void deleteById(Long id);
 
-    Event validateEvent(Event event, User user);
+    EventDto validateEvent(Event event);
 
-    Event refuseEvent(Event event, User user);
+    EventDto refuseEvent(Event event);
 }

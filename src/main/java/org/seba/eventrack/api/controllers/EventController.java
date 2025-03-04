@@ -68,14 +68,18 @@ public class EventController {
 
 
     @PutMapping("/{id}/accept")
-    public ResponseEntity<Event> acceptEvent(@RequestBody EventForm eventForm, @AuthenticationPrincipal User user, @PathVariable Long id) {
-        Event event = eventForm.toEvent(eventForm);
-        return ResponseEntity.ok(eventService.validateEvent(event, user));
+    public ResponseEntity<EventDto> acceptEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(eventService.validateEvent(eventService.findById(id)));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Event> rejectEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
-        return ResponseEntity.ok(eventService.validateEvent(event, user));
+    public ResponseEntity<EventDto> rejectEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(eventService.refuseEvent(eventService.findById(id)));
+    }
+
+    @DeleteMapping("/{id}/remove")
+    public ResponseEntity<Void> removeEvent(@PathVariable Long id) {
+        eventService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

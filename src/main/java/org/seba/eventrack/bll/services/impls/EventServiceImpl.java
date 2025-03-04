@@ -2,6 +2,7 @@ package org.seba.eventrack.bll.services.impls;
 
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
+import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.Event;
@@ -82,12 +83,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event validateEvent(Event event, User user) {
+    public EventDto validateEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
-        }
-        if (!userRepository.existsById(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         Optional<Event> existingEvent = eventRepository.findById(event.getId());
         if (existingEvent.isEmpty()) {
@@ -96,19 +94,21 @@ public class EventServiceImpl implements EventService {
         Event updatedEvent = existingEvent.get();
         updatedEvent.setEventStatus(EventStatus.ACCEPTED);
         eventRepository.save(updatedEvent);
-        return updatedEvent;
+        return EventDto.fromEvent(updatedEvent);
     }
 
     @Override
-    public Event refuseEvent(Event event, User user) {
+    public EventDto refuseEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        if (!userRepository.existsById(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
+        Event updatedEvent = existingEvent.get();
         event.setEventStatus(EventStatus.REJECTED);
-        update(event);
-        return event;
+        eventRepository.save(updatedEvent);
+        return EventDto.fromEvent(updatedEvent);
     }
 }
