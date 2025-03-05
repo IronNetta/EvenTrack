@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        User existingUser = userRepository.findById(user.getId())
+    public User updateUser(User user, String email) {
+        User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + user.getId()));
 
         if (!existingUser.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
@@ -77,5 +77,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
         userRepository.delete(user);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
     }
 }

@@ -3,6 +3,8 @@ package org.seba.eventrack.api.controllers;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.security.dtos.UserSessionDTO;
+import org.seba.eventrack.api.models.user.dtos.UserDTO;
+import org.seba.eventrack.api.models.user.forms.UserForm;
 import org.seba.eventrack.bll.services.UserService;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
@@ -53,15 +55,14 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserSessionDTO> createUser(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
+    public ResponseEntity<UserSessionDTO> createUser(@RequestBody UserForm user) {
+        User savedUser = userService.saveUser(user.toUser());
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<UserSessionDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
+    @PutMapping("/{email}")
+    public ResponseEntity<UserSessionDTO> updateUser(@PathVariable String email, @RequestBody UserForm user) {
+        User updatedUser = userService.updateUser(user.toUser(), email);
         return ResponseEntity.ok(UserSessionDTO.fromUser(updatedUser));
     }
 
