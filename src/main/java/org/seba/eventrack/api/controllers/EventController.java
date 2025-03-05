@@ -53,19 +53,19 @@ public class EventController {
         return ResponseEntity.ok(eventService.findById(id));
     }
 
-    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PostMapping
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
         return ResponseEntity.ok(eventService.save(event));
     }
 
-    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
         return ResponseEntity.ok(eventService.update(event));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
@@ -73,23 +73,26 @@ public class EventController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/accept")
     public ResponseEntity<EventDto> acceptEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
         return ResponseEntity.ok(eventService.validateEvent(eventService.findById(id)));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/reject")
     public ResponseEntity<EventDto> rejectEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
         return ResponseEntity.ok(eventService.refuseEvent(eventService.findById(id)));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}/remove")
     public ResponseEntity<Void> removeEvent(@PathVariable Long id) {
         eventService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/planning")
     public ResponseEntity<CustomPage<EventDto>> getPlanningEvents(
             @RequestParam(defaultValue = "1") int page,
