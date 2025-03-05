@@ -35,9 +35,10 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - Suppression d'événements frauduleux
 
 ### 7. Statistiques & Dashboard (optionnel)
-- Nombre de participants à un événement
-- Taux de remplissage des événements
-- Popularité des événements
+- ✅ Nombre de participants à un événement
+- ✅ Taux de remplissage des événements
+- ✅ Popularité des événements
+- (Méhtodes existes mais doivent être utilisées)
 
 ### 8. Gestion des plannings
 - Planification des événements

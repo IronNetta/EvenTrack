@@ -26,4 +26,10 @@ public interface EventService {
     Event validateEvent(Event event, User user);
 
     Event refuseEvent(Event event, User user);
+
+    Double GetPourcentage(Long eventId);
+
+    Double getRatioOfReservedSeats(Long eventId);
+
+    Double getPopularity(Long eventId);
 }
