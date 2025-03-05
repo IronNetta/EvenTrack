@@ -51,6 +51,7 @@ public class Event extends BaseEntity<Long> {
     @JoinColumn(name = "organizer_id")
     private User organizer;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Ticket> tickets;
 
