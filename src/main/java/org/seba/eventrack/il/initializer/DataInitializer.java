@@ -47,8 +47,9 @@ public class DataInitializer implements CommandLineRunner {
             User admin = new User("admin", "admin@email.com", password, UserRole.ADMIN);
             User organizer = new User("organizer", "organizer@email.com", password, UserRole.ORGANIZER);
             User participant = new User("participant", "participant@email.com", password, UserRole.PARTICIPANT);
+            User Salope = new User("Salope", "gamahab262@bnsteps.com", password, UserRole.PARTICIPANT);
 
-            userRepository.saveAll(List.of(admin, organizer, participant));
+            userRepository.saveAll(List.of(admin, organizer, participant, Salope));
         }
     }
 

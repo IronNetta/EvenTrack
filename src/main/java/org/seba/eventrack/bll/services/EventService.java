@@ -33,4 +33,10 @@ public interface EventService {
     Page<Event> findAllByDate(int year, int month, Pageable pageable);
 
     Event planifyEvent(Event event, LocalDateTime dateTime);
+
+    Double GetPourcentage(Long eventId);
+
+    Double getRatioOfReservedSeats(Long eventId);
+
+    Double getPopularity(Long eventId);
 }

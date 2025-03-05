@@ -115,4 +115,10 @@ public class EventController {
         EventDto eventDto;
         return ResponseEntity.ok(EventDto.fromEvent(eventService.planifyEvent(eventService.findById(id), date)));
     }
+
+    @PreAuthorize("hasRole('ORGANIZER')")
+    @GetMapping("/popularity/{id}")
+    public ResponseEntity<Double> getPopularity(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getPopularity(id));
+    }
 }

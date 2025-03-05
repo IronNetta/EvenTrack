@@ -65,5 +65,6 @@ public class Event extends BaseEntity<Long> {
         this.location = location;
         this.capacity = capacity;
         this.eventStatus = EventStatus.PENDING;
+        this.price = 50.0;
     }
 }
