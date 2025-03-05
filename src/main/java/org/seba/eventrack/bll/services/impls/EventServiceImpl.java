@@ -152,8 +152,6 @@ public class EventServiceImpl implements EventService {
 
         long daysToFill = Duration.between(eventCreatedAt, lastTicketCreatedAt).toDays();
 
-        double popularity = 1.0 / (daysToFill + 1); // Plus c'est rapide, plus c'est populaire
-
-        return popularity;
+        return 1.0 / (daysToFill + 1);
     }
 }
