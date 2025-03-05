@@ -35,9 +35,10 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - Suppression d'événements frauduleux
 
 ### 7. Statistiques & Dashboard (optionnel)
-- Nombre de participants à un événement
-- Taux de remplissage des événements
-- Popularité des événements
+- ✅ Nombre de participants à un événement
+- ✅ Taux de remplissage des événements
+- ✅ Popularité des événements
+- (Méhtodes existes mais doivent être utilisées)
 
 ### 8. Gestion des plannings
 - Planification des événements
@@ -45,21 +46,21 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 
 ## Endpoints principaux (REST API)
 
-| Méthode | Endpoint                  | Description                             |
-|---------|---------------------------|-----------------------------------------|
-| POST    | `/auth/register`          | Inscription d’un utilisateur            |
-| POST    | `/auth/login`             | Connexion et récupération du token      |
-| GET     | `/events`                 | Lister tous les événements              |
-| GET     | `/events/{id}`            | Récupérer un événement spécifique       |
-| POST    | `/events`                 | Créer un événement (organisateur)       |
-| PUT     | `/events/{id}`            | Modifier un événement                   |
-| DELETE  | `/events/{id}`            | Supprimer un événement                  |
-| POST    | `/events/{id}/reserve`    | Réserver un billet                      |
-| GET     | `/users/{id}/tickets`     | Voir les billets d’un utilisateur       |
-| DELETE  | `/tickets/{id}`           | Annuler une réservation                 |
-| POST    | `/events/{id}/approve`    | Approuver un événement (admin)          |
-| POST    | `/events/{id}/reject`     | Refuser un événement (admin)            |
-
+| Méthode | Endpoint                  | Description                              |
+|---------|---------------------------|------------------------------------------|
+| POST    | `/auth/register`          | Inscription d’un utilisateur             |
+| POST    | `/auth/login`             | Connexion et récupération du token       |
+| GET     | `/events`                 | Lister tous les événements               |
+| GET     | `/events/{id}`            | Récupérer un événement spécifique        |
+| POST    | `/events`                 | Créer un événement (organisateur)        |
+| PUT     | `/events/{id}`            | Modifier un événement                    |
+| DELETE  | `/events/{id}`            | Supprimer un événement                   |
+| POST    | `/events/{id}/reserve`    | Réserver un billet                       |
+| GET     | `/users/{id}/tickets`     | Voir les billets d’un utilisateur        |
+| DELETE  | `/tickets/{id}`           | Annuler une réservation                  |
+| POST    | `/events/{id}/approve`    | Approuver un événement (admin)           |
+| POST    | `/events/{id}/reject`     | Refuser un événement (admin)             |
+| GET     | `/events/popularity/{id}` | Récupérer la popularité  (organisateur)  |
 
 ## Installation
 ### Prérequis
@@ -76,23 +77,27 @@ mvn clean install
 ```
 
 ### Configuration
-Modifier le fichier **application.yml** avec vos propres valeurs :
+Modifier le fichier **application.properties** avec vos propres valeurs :
 ```properties
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/eventrack
-    username: Username
-    password: Password
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-server:
-  port: 8080
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventrack
+spring.datasource.username=username
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+stripe.secretKey=your_stripe_secret_key
+
+spring.mail.host=smtp_host
+spring.mail.port=your_smtp_port
+spring.mail.username=your_email
+spring.mail.password=your_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+server.port=your_port
 ```
 
 ## Lancement

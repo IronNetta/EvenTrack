@@ -76,4 +76,10 @@ public class EventController {
     public ResponseEntity<Event> rejectEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
         return ResponseEntity.ok(eventService.validateEvent(event, user));
     }
+
+    @PreAuthorize("hasRole('ORGANIZER')")
+    @GetMapping("/popularity/{id}")
+    public ResponseEntity<Double> getPopularity(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getPopularity(id));
+    }
 }
