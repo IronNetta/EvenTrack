@@ -9,11 +9,8 @@ import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service("paypal")
 @RequiredArgsConstructor
@@ -25,9 +22,7 @@ public class PayPalPaymentServiceImpl implements PaymentService {
     public String createPayment(Double amount, String currency, Long userId, Long eventId) {
         Amount paymentAmount = new Amount();
         paymentAmount.setCurrency(currency);
-        DecimalFormat decimalFormat = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
-        String formattedAmount = decimalFormat.format(amount);
-        paymentAmount.setTotal(formattedAmount);
+        paymentAmount.setTotal(String.format("%.2f", amount));
 
         Transaction transaction = new Transaction();
         transaction.setAmount(paymentAmount);

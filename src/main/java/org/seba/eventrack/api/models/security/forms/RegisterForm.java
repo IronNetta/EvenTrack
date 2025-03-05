@@ -7,19 +7,21 @@ import org.seba.eventrack.dl.entities.User;
 import java.time.LocalDate;
 
 public record RegisterForm(
+        @NotBlank @Size(max = 50)
+        String username,
         @NotBlank @Size(max = 150)
         String email,
         @NotBlank
-        String password,
-        @NotBlank @Size(max = 50)
-        String username
+        String password
+
 ) {
 
     public User toUser() {
         return new User(
+                username,
                 email,
-                password,
-                username
+                password
+
         );
     }
 }

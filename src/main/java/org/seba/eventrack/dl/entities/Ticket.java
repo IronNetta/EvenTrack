@@ -24,6 +24,7 @@ public class Ticket extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private TicketStatus status = TicketStatus.AVAILABLE;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;

@@ -3,6 +3,7 @@ package org.seba.eventrack.api.controllers;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
+import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.User;
@@ -15,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,7 @@ public class EventController {
 
     private final EventService eventService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<CustomPage<EventDto>> getAllEvents(
             @RequestParam Map<String, String> params,
@@ -43,22 +47,25 @@ public class EventController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.findById(id));
+    public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.findById(id)));
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        return ResponseEntity.ok(eventService.save(event));
+    public ResponseEntity<EventDto> createEvent(@RequestBody Event event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event)));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
-        return ResponseEntity.ok(eventService.update(event));
+    public ResponseEntity<EventDto> updateEvent(@PathVariable Long id, @RequestBody Event event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.update(event)));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
@@ -66,14 +73,60 @@ public class EventController {
     }
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/accept")
-    public ResponseEntity<Event> acceptEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
-        return ResponseEntity.ok(eventService.validateEvent(event, user));
+    public ResponseEntity<EventDto> acceptEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(eventService.validateEvent(eventService.findById(id)));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Event> rejectEvent(@RequestBody Event event, @AuthenticationPrincipal User user, @PathVariable String id) {
-        return ResponseEntity.ok(eventService.validateEvent(event, user));
+    public ResponseEntity<EventDto> rejectEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(eventService.refuseEvent(eventService.findById(id)));
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{id}/remove")
+    public ResponseEntity<Void> removeEvent(@PathVariable Long id) {
+        eventService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/planning")
+    public ResponseEntity<CustomPage<EventDto>> getPlanningEvents(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "date") String sort,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        Page<Event> events = eventService.findAllByDate(
+                year,
+                month,
+                PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, sort))
+        );
+        List<EventDto> dtos = events.getContent().stream()
+                .map(EventDto::fromEvent)
+                .toList();
+        CustomPage<EventDto> result = new CustomPage<>(dtos,events.getTotalPages(),events.getNumber() + 1);
+        return ResponseEntity.ok(result);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{id}/planify")
+    public ResponseEntity<EventDto> planifyEvent(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @RequestParam LocalDateTime date
+            ) {
+        EventDto eventDto;
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.planifyEvent(eventService.findById(id), date)));
+    }
+
+    @PreAuthorize("hasRole('ORGANIZER')")
+    @GetMapping("/popularity/{id}")
+    public ResponseEntity<Double> getPopularity(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getPopularity(id));
     }
 }

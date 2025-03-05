@@ -1,9 +1,11 @@
 package org.seba.eventrack.api.controllers;
 
+import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.ticket.dtos.TicketDto;
 import org.seba.eventrack.bll.services.TicketService;
+import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.seba.eventrack.dl.entities.Ticket;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<CustomPage<TicketDto>> getAllTickets(
             @RequestParam Map<String, String> params,
@@ -40,16 +43,21 @@ public class TicketController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/book")
-    public ResponseEntity<String> bookTicket(@RequestParam Long eventId, @RequestParam Long userId) {
-        return ResponseEntity.ok(ticketService.bookTicket(eventId, userId));
+    public ResponseEntity<String> bookTicket(@RequestParam Long eventId,
+                                             @RequestParam Long userId) {
+        String paymentUrl = ticketService.bookTicket(eventId, userId);
+        return ResponseEntity.ok(paymentUrl); // Retourne l'URL Stripe immédiatement
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
+    public ResponseEntity<TicketDto> getTicketById(@PathVariable Long id) {
         return ResponseEntity.ok(ticketService.findById(id));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/cancel/{id}")
     public ResponseEntity<Void> cancelTicket(@PathVariable Long id) {
         ticketService.cancelTicket(id);
