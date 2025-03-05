@@ -49,20 +49,20 @@ public class EventController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.findById(id));
+    public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.findById(id)));
     }
 
     @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        return ResponseEntity.ok(eventService.save(event));
+    public ResponseEntity<EventDto> createEvent(@RequestBody Event event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event)));
     }
 
     @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
-        return ResponseEntity.ok(eventService.update(event));
+    public ResponseEntity<EventDto> updateEvent(@PathVariable Long id, @RequestBody Event event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.update(event)));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
