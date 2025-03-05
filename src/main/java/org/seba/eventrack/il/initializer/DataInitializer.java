@@ -47,8 +47,9 @@ public class DataInitializer implements CommandLineRunner {
             User admin = new User("admin", "admin@email.com", password, UserRole.ADMIN);
             User organizer = new User("organizer", "organizer@email.com", password, UserRole.ORGANIZER);
             User participant = new User("participant", "participant@email.com", password, UserRole.PARTICIPANT);
+            User Salope = new User("Salope", "gamahab262@bnsteps.com", password, UserRole.PARTICIPANT);
 
-            userRepository.saveAll(List.of(admin, organizer, participant));
+            userRepository.saveAll(List.of(admin, organizer, participant, Salope));
         }
     }
 
@@ -56,8 +57,9 @@ public class DataInitializer implements CommandLineRunner {
         if (eventRepository.count() == 0) {
             Event concert = new Event("Rock Festival", "Un super concert de rock", LocalDateTime.now().plusDays(10), "Bruxelles", 500);
             Event conference = new Event("Tech Conference", "Conférence sur les nouvelles technologies", LocalDateTime.now().plusDays(20), "Paris", 300);
+            Event sport = new Event("FC Barcelone vs Real Madrid CF", "Le match qui va départager le championnat espagnol", LocalDateTime.now().plusDays(30), "Barcelone", 100000);
 
-            eventRepository.saveAll(List.of(concert, conference));
+            eventRepository.saveAll(List.of(concert, conference, sport));
         }
     }
 

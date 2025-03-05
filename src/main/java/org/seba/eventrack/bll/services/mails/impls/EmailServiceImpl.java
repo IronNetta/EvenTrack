@@ -20,6 +20,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,7 @@ public class EmailServiceImpl implements EmailService {
         }
 
         catch (Exception e) {
+            e.printStackTrace();
             return "Error while Sending Mail";
         }
     }
@@ -71,7 +73,8 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setText(emailContent, true);
 
             FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
-            mimeMessageHelper.addAttachment(file.getFilename(), file);
+
+            mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
             javaMailSender.send(mimeMessage);
             return "Mail sent successfully with attachment";
