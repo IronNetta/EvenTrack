@@ -54,7 +54,12 @@ public class Event extends BaseEntity<Long> {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Ticket> tickets;
 
-    public Event(String title, String description, LocalDateTime localDateTime, String location, int capacity) {
+    public Event(String title, String description, LocalDateTime date, String location, int capacity) {
+        this(title, description, location, capacity);
+        this.date = date;
+    }
+
+    public Event(String title, String description, String location, int capacity) {
         this.title = title;
         this.description = description;
         this.location = location;
