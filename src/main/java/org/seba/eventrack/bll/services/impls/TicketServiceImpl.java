@@ -65,14 +65,13 @@ public class TicketServiceImpl implements TicketService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
 
-        /*Test mail sans Stripe
         Ticket ticket = new Ticket();
         ticket.setPaid(true);
         ticket.setEvent(event);
         ticket.setParticipant(user);
         String qrCodePath = qrCodeService.generateQrCode(ticket.getId());
         ticket.setQrCodeUrl(qrCodePath);
-        emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));*/
+        emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
 
         return paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
     }
@@ -109,7 +108,6 @@ public class TicketServiceImpl implements TicketService {
         eventRepository.save(event);
 
         // Envoi du mail avec le ticket
-        emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket"));
         emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
 
         return ticketRepository.save(ticket);
