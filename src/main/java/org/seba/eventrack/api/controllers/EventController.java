@@ -28,7 +28,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PreAuthorize("isAuthenticated()")
+
     @GetMapping
     public ResponseEntity<CustomPage<EventDto>> getAllEvents(
             @RequestParam Map<String, String> params,
@@ -53,13 +53,13 @@ public class EventController {
         return ResponseEntity.ok(EventDto.fromEvent(eventService.findById(id)));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @PostMapping
-    public ResponseEntity<EventDto> createEvent(@RequestBody Event event) {
-        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event)));
+    public ResponseEntity<EventDto> createEvent(@RequestBody EventForm event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event.toEvent())));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @PutMapping("/{id}")
     public ResponseEntity<EventDto> updateEvent(@PathVariable Long id, @RequestBody Event event) {
         return ResponseEntity.ok(EventDto.fromEvent(eventService.update(event)));
