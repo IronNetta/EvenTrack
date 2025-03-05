@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -81,5 +83,36 @@ public class EventController {
     public ResponseEntity<Void> removeEvent(@PathVariable Long id) {
         eventService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/planning")
+    public ResponseEntity<CustomPage<EventDto>> getPlanningEvents(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "date") String sort,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        Page<Event> events = eventService.findAllByDate(
+                year,
+                month,
+                PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, sort))
+        );
+        List<EventDto> dtos = events.getContent().stream()
+                .map(EventDto::fromEvent)
+                .toList();
+        CustomPage<EventDto> result = new CustomPage<>(dtos,events.getTotalPages(),events.getNumber() + 1);
+        return ResponseEntity.ok(result);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{id}/planify")
+    public ResponseEntity<EventDto> planifyEvent(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @RequestParam LocalDateTime date
+            ) {
+        EventDto eventDto;
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.planifyEvent(eventService.findById(id), date)));
     }
 }

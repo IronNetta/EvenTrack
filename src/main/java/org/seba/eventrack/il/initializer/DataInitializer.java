@@ -56,8 +56,9 @@ public class DataInitializer implements CommandLineRunner {
         if (eventRepository.count() == 0) {
             Event concert = new Event("Rock Festival", "Un super concert de rock", LocalDateTime.now().plusDays(10), "Bruxelles", 500);
             Event conference = new Event("Tech Conference", "Conférence sur les nouvelles technologies", LocalDateTime.now().plusDays(20), "Paris", 300);
+            Event sport = new Event("FC Barcelone vs Real Madrid CF", "Le match qui va départager le championnat espagnol", LocalDateTime.now().plusDays(30), "Barcelone", 100000);
 
-            eventRepository.saveAll(List.of(concert, conference));
+            eventRepository.saveAll(List.of(concert, conference, sport));
         }
     }
 

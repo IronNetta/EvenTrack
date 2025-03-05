@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
@@ -28,4 +29,8 @@ public interface EventService {
     EventDto validateEvent(Event event);
 
     EventDto refuseEvent(Event event);
+
+    Page<Event> findAllByDate(int year, int month, Pageable pageable);
+
+    Event planifyEvent(Event event, LocalDateTime dateTime);
 }

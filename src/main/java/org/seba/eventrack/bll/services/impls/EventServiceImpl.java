@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,5 +111,22 @@ public class EventServiceImpl implements EventService {
         event.setEventStatus(EventStatus.REJECTED);
         eventRepository.save(updatedEvent);
         return EventDto.fromEvent(updatedEvent);
+    }
+
+    @Override
+    public Page<Event> findAllByDate(int year, int month, Pageable pageable) {
+        return eventRepository.findByDate(year, month, pageable);
+    }
+
+    @Override
+    public Event planifyEvent(Event event, LocalDateTime date) {
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+        Event updatedEvent = existingEvent.get();
+        updatedEvent.setDate(date);
+        eventRepository.save(updatedEvent);
+        return updatedEvent;
     }
 }
