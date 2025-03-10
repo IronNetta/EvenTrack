@@ -154,5 +154,7 @@ La documentation complète est disponible via **Swagger** :
 - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ## Licence
-MIT License - Voir le fichier `LICENSE` pour plus de détails.
+Projet developpé chez Technifutur en collaboration avec : 
+- [Barnabé Dussart](https://github.com/AtomDus)
+- [Daniel Hajdini](https://github.com/DanHajdini)
 
