@@ -22,13 +22,13 @@ public interface EventService {
 
     Event findById(Long id);
 
-    Event update(Event event);
+    Event update(Event event, Long id);
 
     void deleteById(Long id);
 
-    EventDto validateEvent(Event event);
+    Event validateEvent(Event event);
 
-    EventDto refuseEvent(Event event);
+    Event refuseEvent(Event event);
 
     Page<Event> findAllByDate(int year, int month, Pageable pageable);
 

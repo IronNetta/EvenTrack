@@ -59,7 +59,7 @@ public class User extends BaseEntity<Long> implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PaymentMethod preferredPaymentMethod = PaymentMethod.NONE;
 
-    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Event> organizedEvents;
 
     public User() {

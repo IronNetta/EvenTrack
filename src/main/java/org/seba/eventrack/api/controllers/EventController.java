@@ -28,7 +28,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PreAuthorize("isAuthenticated()")
+
     @GetMapping
     public ResponseEntity<CustomPage<EventDto>> getAllEvents(
             @RequestParam Map<String, String> params,
@@ -47,23 +47,23 @@ public class EventController {
         return ResponseEntity.ok(result);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(EventDto.fromEvent(eventService.findById(id)));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @PostMapping
-    public ResponseEntity<EventDto> createEvent(@RequestBody Event event) {
-        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event)));
+    public ResponseEntity<EventDto> createEvent(@AuthenticationPrincipal User user ,@RequestBody EventForm eventForm) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(eventForm.toEvent())));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasRole('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @PutMapping("/{id}")
-    public ResponseEntity<EventDto> updateEvent(@PathVariable Long id, @RequestBody Event event) {
-        return ResponseEntity.ok(EventDto.fromEvent(eventService.update(event)));
+    public ResponseEntity<EventDto> updateEvent(@PathVariable Long id, @RequestBody EventForm eventForm) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.update(eventForm.toEvent(), id)));
     }
+    //TODO gérer le cas de la modification si c'est le user qui a créé l'event
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
@@ -71,25 +71,19 @@ public class EventController {
         eventService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    //TODO gérer le cas de la suppression si c'est le user qui a créé l'event
 
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/accept")
-    public ResponseEntity<EventDto> acceptEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
-        return ResponseEntity.ok(eventService.validateEvent(eventService.findById(id)));
+    public ResponseEntity<EventDto> acceptEvent(@PathVariable Long id) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.validateEvent(eventService.findById(id))));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}/reject")
-    public ResponseEntity<EventDto> rejectEvent(@AuthenticationPrincipal User user, @PathVariable Long id) {
-        return ResponseEntity.ok(eventService.refuseEvent(eventService.findById(id)));
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/{id}/remove")
-    public ResponseEntity<Void> removeEvent(@PathVariable Long id) {
-        eventService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<EventDto> rejectEvent(@PathVariable Long id) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.refuseEvent(eventService.findById(id))));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -120,11 +114,10 @@ public class EventController {
             @PathVariable Long id,
             @RequestParam LocalDateTime date
             ) {
-        EventDto eventDto;
         return ResponseEntity.ok(EventDto.fromEvent(eventService.planifyEvent(eventService.findById(id), date)));
     }
 
-    @PreAuthorize("hasRole('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ORGANIZER')")
     @GetMapping("/popularity/{id}")
     public ResponseEntity<Double> getPopularity(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getPopularity(id));

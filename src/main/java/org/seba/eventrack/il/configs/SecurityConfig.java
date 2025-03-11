@@ -1,5 +1,7 @@
 package org.seba.eventrack.il.configs;
 
+import org.seba.eventrack.bll.services.EventService;
+import org.seba.eventrack.bll.services.impls.EventServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;

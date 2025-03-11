@@ -1,6 +1,7 @@
 package org.seba.eventrack.dl.entities;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
 import org.seba.eventrack.dl.enums.EventStatus;
@@ -8,6 +9,7 @@ import org.seba.eventrack.dl.enums.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter @Setter
@@ -47,7 +49,7 @@ public class Event extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organizer_id")
     private User organizer;
 
@@ -55,9 +57,17 @@ public class Event extends BaseEntity<Long> {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Ticket> tickets;
 
-    public Event(String title, String description, LocalDateTime date, String location, int capacity) {
+    public Event(String title, String description, String location, int capacity, String imageUrl, Double price, EventType eventType) {
+        this(title, description, location, capacity);
+        this.imageUrl = imageUrl;
+        this.price = price;
+        this.eventType = eventType;
+    }
+
+    public Event(String title, String description, LocalDateTime date, String location, int capacity, EventType eventType) {
         this(title, description, location, capacity);
         this.date = date;
+        this.eventType = eventType;
     }
 
     public Event(String title, String description, String location, int capacity) {
@@ -66,6 +76,5 @@ public class Event extends BaseEntity<Long> {
         this.location = location;
         this.capacity = capacity;
         this.eventStatus = EventStatus.PENDING;
-        this.price = 50.0;
     }
 }
