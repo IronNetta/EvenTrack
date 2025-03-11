@@ -11,4 +11,8 @@ public record TicketDto(
     public static TicketDto fromTicket(Ticket ticket) {
         return new TicketDto(ticket.getId(), ticket.getEvent().getId(), ticket.getParticipant().getId());
     }
+
+    public long getId() {
+        return id;
+    }
 }
