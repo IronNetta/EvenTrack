@@ -73,6 +73,7 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setText(emailContent, true);
 
             FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
+            mimeMessageHelper.addInline("qrCodeImage", file);
 
             mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
