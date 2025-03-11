@@ -67,8 +67,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+        Long id = userService.getUserByEmail(email).getId();
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

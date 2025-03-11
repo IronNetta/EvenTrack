@@ -13,8 +13,13 @@ public record EventForm(
         Double price,
         EventType eventType
 ) {
+<<<<<<< HEAD
 
     public Event toEvent() {
         return new Event(title, description, location, capacity, imageUrl, price, eventType);
+=======
+    public Event toEvent() {
+        return new Event(title, description, location, capacity);
+>>>>>>> 301ddebc4b50c84d8ef2346d8b1201af46818a6b
     }
 }

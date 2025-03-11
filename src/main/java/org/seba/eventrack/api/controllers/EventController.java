@@ -54,8 +54,13 @@ public class EventController {
 
     @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @PostMapping
+<<<<<<< HEAD
     public ResponseEntity<EventDto> createEvent(@AuthenticationPrincipal User user ,@RequestBody EventForm eventForm) {
         return ResponseEntity.ok(EventDto.fromEvent(eventService.save(eventForm.toEvent())));
+=======
+    public ResponseEntity<EventDto> createEvent(@RequestBody EventForm event) {
+        return ResponseEntity.ok(EventDto.fromEvent(eventService.save(event.toEvent())));
+>>>>>>> 301ddebc4b50c84d8ef2346d8b1201af46818a6b
     }
 
     @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
