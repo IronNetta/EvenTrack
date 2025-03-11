@@ -3,6 +3,7 @@ package org.seba.eventrack.api.models.event.dtos;
 import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.enums.EventStatus;
+import org.seba.eventrack.dl.enums.EventType;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ public record EventDto(
         LocalDateTime date,
         String location,
         int capacity,
+        EventType eventType,
         EventStatus eventStatus
 ) {
     public static EventDto fromEvent(Event event) {
@@ -22,6 +24,7 @@ public record EventDto(
                 event.getDate(),
                 event.getLocation(),
                 event.getCapacity(),
+                event.getEventType(),
                 event.getEventStatus()
         );
     }

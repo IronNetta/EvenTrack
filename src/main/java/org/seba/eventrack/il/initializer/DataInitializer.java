@@ -7,6 +7,7 @@ import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.Ticket;
 import org.seba.eventrack.dl.entities.User;
+import org.seba.eventrack.dl.enums.EventType;
 import org.seba.eventrack.dl.enums.UserRole;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -47,18 +48,20 @@ public class DataInitializer implements CommandLineRunner {
             User admin = new User("admin", "admin@email.com", password, UserRole.ADMIN);
             User organizer = new User("organizer", "organizer@email.com", password, UserRole.ORGANIZER);
             User participant = new User("participant", "participant@email.com", password, UserRole.PARTICIPANT);
+
+            User danj = new User("danj", "danj@email.com", password, UserRole.ORGANIZER);
             User Salope = new User("Salope", "homajig612@oziere.com", password, UserRole.PARTICIPANT);
 
-            userRepository.saveAll(List.of(admin, organizer, participant, Salope));
+            userRepository.saveAll(List.of(admin, organizer, participant, Salope, danj));
         }
     }
 
 
     private void loadEvents() {
         if (eventRepository.count() == 0) {
-            Event concert = new Event("Rock Festival", "Un super concert de rock", LocalDateTime.now().plusDays(10), "Bruxelles", 500);
-            Event conference = new Event("Tech Conference", "Conférence sur les nouvelles technologies", LocalDateTime.now().plusDays(20), "Paris", 300);
-            Event sport = new Event("FC Barcelone vs Real Madrid CF", "Le match qui va départager le championnat espagnol", LocalDateTime.now().plusDays(30), "Barcelone", 100000);
+            Event concert = new Event("Rock Festival", "Un super concert de rock", LocalDateTime.now().plusDays(10), "Bruxelles", 500, EventType.CONCERT);
+            Event conference = new Event("Tech Conference", "Conférence sur les nouvelles technologies", LocalDateTime.now().plusDays(20), "Paris", 300, EventType.CONFERENCE);
+            Event sport = new Event("FC Barcelone vs Real Madrid CF", "Le match qui va départager le championnat espagnol", LocalDateTime.now().plusDays(30), "Barcelone", 100000, EventType.SPORT);
 
             eventRepository.saveAll(List.of(concert, conference, sport));
         }

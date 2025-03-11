@@ -1,23 +1,20 @@
 package org.seba.eventrack.bll.services.impls;
 
+
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
-import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dal.repositories.EventRepository;
-import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dl.enums.EventStatus;
-import org.seba.eventrack.dl.enums.UserRole;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.seba.eventrack.il.specification.SearchSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -61,8 +58,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event update(Event event) {
-        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+    public Event update(Event event, Long id) {
+        Optional<Event> existingEvent = eventRepository.findById(id);
         if (existingEvent.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
@@ -87,7 +84,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto validateEvent(Event event) {
+    public Event validateEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
@@ -98,11 +95,11 @@ public class EventServiceImpl implements EventService {
         Event updatedEvent = existingEvent.get();
         updatedEvent.setEventStatus(EventStatus.ACCEPTED);
         eventRepository.save(updatedEvent);
-        return EventDto.fromEvent(updatedEvent);
+        return updatedEvent;
     }
 
     @Override
-    public EventDto refuseEvent(Event event) {
+    public Event refuseEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
@@ -113,7 +110,7 @@ public class EventServiceImpl implements EventService {
         Event updatedEvent = existingEvent.get();
         event.setEventStatus(EventStatus.REJECTED);
         eventRepository.save(updatedEvent);
-        return EventDto.fromEvent(updatedEvent);
+        return updatedEvent;
     }
 
     @Override
