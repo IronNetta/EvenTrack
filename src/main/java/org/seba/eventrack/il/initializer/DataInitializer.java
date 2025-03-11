@@ -53,6 +53,7 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+
     private void loadEvents() {
         if (eventRepository.count() == 0) {
             Event concert = new Event("Rock Festival", "Un super concert de rock", LocalDateTime.now().plusDays(10), "Bruxelles", 500);
