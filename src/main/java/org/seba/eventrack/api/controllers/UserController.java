@@ -60,7 +60,6 @@ public class UserController {
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{email}")
     public ResponseEntity<UserSessionDTO> updateUser(@PathVariable String email, @RequestBody UserForm user) {
         User updatedUser = userService.updateUser(user.toUser(), email);
@@ -68,8 +67,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+        Long id = userService.getUserByEmail(email).getId();
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

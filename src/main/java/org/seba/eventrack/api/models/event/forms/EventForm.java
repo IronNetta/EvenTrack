@@ -8,7 +8,7 @@ public record EventForm(
         String location,
         int capacity
 ) {
-    public Event toEvent(EventForm eventForm) {
+    public Event toEvent() {
         return new Event(title, description, location, capacity);
     }
 }
