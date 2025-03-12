@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
 import org.seba.eventrack.dl.enums.TicketStatus;
+import org.seba.eventrack.dl.enums.TicketType;
 
 @Entity
 @Getter @Setter
@@ -23,6 +24,10 @@ public class Ticket extends BaseEntity<Long> {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TicketStatus status = TicketStatus.AVAILABLE;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TicketType type;
 
     @ToString.Exclude
     @ManyToOne

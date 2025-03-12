@@ -7,6 +7,7 @@ import org.seba.eventrack.api.models.ticket.dtos.TicketDto;
 import org.seba.eventrack.bll.services.TicketService;
 import org.seba.eventrack.bll.services.payment.PaymentService;
 import org.seba.eventrack.dl.entities.Ticket;
+import org.seba.eventrack.dl.enums.TicketType;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,8 +47,9 @@ public class TicketController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/book")
     public ResponseEntity<String> bookTicket(@RequestParam Long eventId,
-                                             @RequestParam Long userId) {
-        String paymentUrl = ticketService.bookTicket(eventId, userId);
+                                             @RequestParam Long userId,
+                                             @RequestParam TicketType ticketType) {
+        String paymentUrl = ticketService.bookTicket(eventId, userId, ticketType);
         return ResponseEntity.ok(paymentUrl); // Retourne l'URL Stripe immédiatement
     }
 

@@ -1,13 +1,10 @@
 package org.seba.eventrack.bll.services.payment.impl;
 
-import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.APIContext;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
-import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +32,13 @@ public class StripePaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String createPayment(Double amount, String currency, Long userId, Long eventId) {
-
+    public String createPayment(Double amount, String currency, Long userId, Long eventId, String ticketType) {
         try {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("userId", userId.toString());
+            metadata.put("eventId", eventId.toString());
+            metadata.put("ticketType", ticketType);
+
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                     .setMode(SessionCreateParams.Mode.PAYMENT)

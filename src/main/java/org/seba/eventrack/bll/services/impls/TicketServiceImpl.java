@@ -1,7 +1,5 @@
 package org.seba.eventrack.bll.services.impls;
 
-import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.PayPalRESTException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +15,7 @@ import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dal.repositories.EventRepository;
 import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
+import org.seba.eventrack.dl.enums.TicketType;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.seba.eventrack.il.specification.SearchSpecification;
 import org.springframework.data.domain.Page;
@@ -55,7 +54,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public String bookTicket(Long eventId, Long userId) {
+    public String bookTicket(Long eventId, Long userId, TicketType ticketType) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         User user = userRepository.findById(userId)
@@ -69,11 +68,12 @@ public class TicketServiceImpl implements TicketService {
         ticket.setPaid(true);
         ticket.setEvent(event);
         ticket.setParticipant(user);
+        ticket.setType(ticketType);
         String qrCodePath = qrCodeService.generateQrCode(ticket.getId());
         ticket.setQrCodeUrl(qrCodePath);
         emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
 
-        return paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
+        return paymentService.createPayment(event.getPrice(), "USD", userId, eventId, ticketType.name());
     }
 
     @Override
@@ -98,6 +98,10 @@ public class TicketServiceImpl implements TicketService {
         ticket.setPaid(true);
         ticket.setEvent(event);
         ticket.setParticipant(user);
+
+        String typeStr = payment.getMetadata().get("ticketType");
+        TicketType ticketType = TicketType.valueOf(typeStr);
+        ticket.setType(ticketType);
 
         // Génération du QR Code
         String qrCodePath = qrCodeService.generateQrCode(ticket.getId());

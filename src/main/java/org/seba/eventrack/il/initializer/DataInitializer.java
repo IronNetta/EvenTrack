@@ -8,6 +8,7 @@ import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.Ticket;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dl.enums.EventType;
+import org.seba.eventrack.dl.enums.TicketType;
 import org.seba.eventrack.dl.enums.UserRole;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -74,6 +75,7 @@ public class DataInitializer implements CommandLineRunner {
 
             if (user != null && event != null) {
                 Ticket ticket = new Ticket(user, event);
+                ticket.setType(TicketType.STANDART);
                 ticketRepository.save(ticket);
             }
         }

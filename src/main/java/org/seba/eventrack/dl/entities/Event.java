@@ -60,14 +60,15 @@ public class Event extends BaseEntity<Long> {
     public Event(String title, String description, String location, int capacity, String imageUrl, Double price, EventType eventType) {
         this(title, description, location, capacity);
         this.imageUrl = imageUrl;
-        this.price = price;
         this.eventType = eventType;
+        this.price = price;
     }
 
     public Event(String title, String description, LocalDateTime date, String location, int capacity, EventType eventType) {
         this(title, description, location, capacity);
         this.date = date;
         this.eventType = eventType;
+        this.price = 50.0;
     }
 
     public Event(String title, String description, String location, int capacity) {
