@@ -59,6 +59,15 @@ public class User extends BaseEntity<Long> implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PaymentMethod preferredPaymentMethod = PaymentMethod.NONE;
 
+    @Column
+    private String otp;  // Stocke le code OTP
+
+    @Column
+    private LocalDateTime otpExpiration; // Expiration de l'OTP
+
+    @Column
+    private boolean twoFactorEnabled;
+
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Event> organizedEvents;
 
