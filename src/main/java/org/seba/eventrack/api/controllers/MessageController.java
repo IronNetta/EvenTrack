@@ -1,6 +1,8 @@
 package org.seba.eventrack.api.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.seba.eventrack.api.models.message.dtos.MessageDTO;
+import org.seba.eventrack.api.models.user.dtos.UserDTO;
 import org.seba.eventrack.bll.services.MessageService;
 import org.seba.eventrack.bll.services.UserService;
 import org.seba.eventrack.dl.entities.Message;
@@ -22,25 +24,25 @@ public class MessageController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/send")
-    public ResponseEntity<Message> sendMessage(
+    public ResponseEntity<MessageDTO> sendMessage(
             @AuthenticationPrincipal User sender,
             @RequestParam Long receiverId,
             @RequestParam String content
     ) {
         User receiver = userService.getUserById(receiverId);
-        return ResponseEntity.ok(messageService.sendMessage(sender, receiver, content));
+        return ResponseEntity.ok(MessageDTO.fromMessage(messageService.sendMessage(sender, receiver, content)));
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/received")
-    public ResponseEntity<List<Message>> getReceivedMessages(@AuthenticationPrincipal User receiver) {
-        return ResponseEntity.ok(messageService.getReceivedMessages(receiver));
+    public ResponseEntity<List<MessageDTO>> getReceivedMessages(@AuthenticationPrincipal User receiver) {
+        return ResponseEntity.ok(messageService.getReceivedMessages(receiver).stream().map(MessageDTO::fromMessage).toList());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/sent")
-    public ResponseEntity<List<Message>> getSentMessages(@AuthenticationPrincipal User sender) {
-        return ResponseEntity.ok(messageService.getSentMessages(sender));
+    public ResponseEntity<List<MessageDTO>> getSentMessages(@AuthenticationPrincipal User sender) {
+        return ResponseEntity.ok(messageService.getSentMessages(sender).stream().map(MessageDTO::fromMessage).toList());
     }
 
     @PreAuthorize("isAuthenticated()")
