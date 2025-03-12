@@ -75,7 +75,7 @@ public class DataInitializer implements CommandLineRunner {
 
             if (user != null && event != null) {
                 Ticket ticket = new Ticket(user, event);
-                ticket.setType(TicketType.STANDART);
+                ticket.setType(TicketType.STANDARD);
                 ticketRepository.save(ticket);
             }
         }
