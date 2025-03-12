@@ -41,8 +41,8 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - (Méhtodes existes mais doivent être utilisées)
 
 ### 8. Gestion des plannings
-- Planification des événements
-- Affichage d'un calendrier avec les événements
+- ✅ Planification des événements
+- ✅ Affichage d'un calendrier avec les événements
 
 ## Endpoints principaux (REST API)
 
