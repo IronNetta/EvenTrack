@@ -29,12 +29,12 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getReceivedMessages(User receiver) {
-        return messageRepository.findByReceiverOrderByTimestampDesc(receiver);
+        return messageRepository.findByReceiverOrderByCreatedAtDesc(receiver);
     }
 
     @Override
     public List<Message> getSentMessages(User sender) {
-        return messageRepository.findBySenderOrderByTimestampDesc(sender);
+        return messageRepository.findBySenderOrderByCreatedAtDesc(sender);
     }
 
     @Override
