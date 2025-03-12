@@ -2,7 +2,6 @@ package org.seba.eventrack.bll.services.impls;
 
 
 import lombok.RequiredArgsConstructor;
-import org.seba.eventrack.api.models.event.dtos.EventDto;
 import org.seba.eventrack.bll.services.EventService;
 import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
@@ -70,6 +69,7 @@ public class EventServiceImpl implements EventService {
         updatedEvent.setCapacity(event.getCapacity());
         updatedEvent.setReservedSeats(event.getReservedSeats());
         updatedEvent.setImageUrl(event.getImageUrl());
+        updatedEvent.setPrice(event.getPrice());
         updatedEvent.setEventType(event.getEventType());
         updatedEvent.setEventStatus(event.getEventStatus());
         return eventRepository.save(updatedEvent);

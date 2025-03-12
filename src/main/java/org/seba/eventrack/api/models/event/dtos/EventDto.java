@@ -14,6 +14,7 @@ public record EventDto(
         LocalDateTime date,
         String location,
         int capacity,
+        Double price,
         EventType eventType,
         EventStatus eventStatus
 ) {
@@ -24,6 +25,7 @@ public record EventDto(
                 event.getDate(),
                 event.getLocation(),
                 event.getCapacity(),
+                event.getPrice(),
                 event.getEventType(),
                 event.getEventStatus()
         );
