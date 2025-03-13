@@ -1,5 +1,6 @@
 package org.seba.eventrack.dl.entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
@@ -38,9 +39,12 @@ public class Event extends BaseEntity<Long> {
     @Column
     private String imageUrl;
 
+    @Schema(description = "Map of ticket type and corresponding price",
+            example = "{\"STANDARD\": 50.0, \"VIP\": 100.0}")
     @ElementCollection
     @CollectionTable(name = "ticket_prices", joinColumns = @JoinColumn(name = "event_id"))
     @MapKeyEnumerated(EnumType.STRING)
+    @MapKeyColumn(name = "ticket_type")
     @Column(name = "price")
     private Map<TicketType, Double> ticketPrices = new HashMap<>();
 

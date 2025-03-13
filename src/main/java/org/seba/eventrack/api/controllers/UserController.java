@@ -60,6 +60,7 @@ public class UserController {
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{email}")
     public ResponseEntity<UserSessionDTO> updateUser(@PathVariable String email, @RequestBody UserForm user) {
         User updatedUser = userService.updateUser(user.toUser(), email);
