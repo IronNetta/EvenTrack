@@ -64,6 +64,11 @@ public class TicketServiceImpl implements TicketService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
 
+        Double price = event.getTicketPrice(ticketType);
+        if (price == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ticket type or price not set");
+        }
+
         Ticket ticket = new Ticket();
         ticket.setPaid(true);
         ticket.setEvent(event);
@@ -73,7 +78,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setQrCodeUrl(qrCodePath);
         emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
 
-        return paymentService.createPayment(event.getPrice(), "USD", userId, eventId, ticketType.name());
+        return paymentService.createPayment(price, "USD", userId, eventId, ticketType.name());
     }
 
     @Override
