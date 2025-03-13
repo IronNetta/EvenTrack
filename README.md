@@ -213,3 +213,7 @@ Projet developpé chez Technifutur en collaboration avec :
 - [Barnabé Dussart](https://github.com/AtomDus)
 - [Daniel Hajdini](https://github.com/DanHajdini)
 
+## Presentation
+Visualisation des slides de presentation:
+[Par Ici](https://docs.google.com/presentation/d/1oW73jsgTMPvrz-eO1IHosnfC_in_fSuCLFi3jHyT2sM/edit?usp=sharing)
+
