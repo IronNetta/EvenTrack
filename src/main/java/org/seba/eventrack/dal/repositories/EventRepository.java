@@ -1,6 +1,7 @@
 package org.seba.eventrack.dal.repositories;
 
 import org.seba.eventrack.dl.entities.Event;
+import org.seba.eventrack.dl.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,10 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     @Query("SELECT e.createdAt FROM Event e WHERE e.id = :eventId")
     LocalDateTime getCreationDate(Long eventId);
+
+    @Query("SELECT COUNT(e) FROM Event e JOIN e.participants p WHERE p = :user")
+    long countByParticipantsContaining(@Param("user") User user);
+
+    @Query("SELECT COUNT(e) FROM Event e WHERE e.organizer = :user")
+    long countByOrganizer(@Param("user") User user);
 }
