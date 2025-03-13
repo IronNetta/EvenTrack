@@ -74,4 +74,13 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{email}/update-two-factor")
+    public ResponseEntity<Void> updateUser(@RequestParam String email, @RequestParam boolean twoFactor) {
+        userService.setTwoFactorEnabled(email, twoFactor);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

@@ -90,5 +90,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
     }
 
-
+    @Override
+    public void setTwoFactorEnabled(String email, Boolean bool) {
+        User existingUser = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with email: " + email)
+        );
+        existingUser.setTwoFactorEnabled(bool);
+        userRepository.save(existingUser);
+    }
 }
