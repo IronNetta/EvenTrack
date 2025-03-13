@@ -20,4 +20,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     User getUserById(Long id);
+
+    void setTwoFactorEnabled(String email, Boolean bool);
 }

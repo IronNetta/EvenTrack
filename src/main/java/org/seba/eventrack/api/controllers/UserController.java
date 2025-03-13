@@ -60,6 +60,7 @@ public class UserController {
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{email}")
     public ResponseEntity<UserSessionDTO> updateUser(@PathVariable String email, @RequestBody UserForm user) {
         User updatedUser = userService.updateUser(user.toUser(), email);
@@ -73,4 +74,13 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{email}/update-two-factor")
+    public ResponseEntity<Void> updateUser(@RequestParam String email, @RequestParam boolean twoFactor) {
+        userService.setTwoFactorEnabled(email, twoFactor);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
