@@ -48,6 +48,14 @@ public class Event extends BaseEntity<Long> {
     @Column(name = "price")
     private Map<TicketType, Double> ticketPrices = new HashMap<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "event_participants",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> participants;
+
     @Column
     private Double ticketPrice;
 
