@@ -215,5 +215,5 @@ Projet developpé chez Technifutur en collaboration avec :
 
 ## Presentation
 Visualisation des slides de presentation:
-[Par Ici](https://docs.google.com/presentation/d/1oW73jsgTMPvrz-eO1IHosnfC_in_fSuCLFi3jHyT2sM/edit?usp=sharing)
+[Par ici](https://docs.google.com/presentation/d/1oW73jsgTMPvrz-eO1IHosnfC_in_fSuCLFi3jHyT2sM/edit?usp=sharing)
 
