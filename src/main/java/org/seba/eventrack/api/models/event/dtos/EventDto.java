@@ -30,4 +30,6 @@ public record EventDto(
                 event.getEventStatus()
         );
     }
+
+
 }

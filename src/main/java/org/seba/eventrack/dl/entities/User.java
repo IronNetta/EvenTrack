@@ -2,6 +2,7 @@ package org.seba.eventrack.dl.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.seba.eventrack.api.models.user.dtos.UserDTO;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
 import org.seba.eventrack.dl.enums.NotificationPreference;
 import org.seba.eventrack.dl.enums.PaymentMethod;
