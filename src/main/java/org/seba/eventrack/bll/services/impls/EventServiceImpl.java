@@ -1,24 +1,24 @@
 package org.seba.eventrack.bll.services.impls;
 
+
 import lombok.RequiredArgsConstructor;
-import org.seba.eventrack.api.models.event.dtos.EventDto;
 import org.seba.eventrack.bll.services.EventService;
+import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dal.repositories.EventRepository;
-import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dl.enums.EventStatus;
-import org.seba.eventrack.dl.enums.UserRole;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.seba.eventrack.il.specification.SearchSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +28,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
 
     @Override
     public Page<Event> findAll(List<SearchParam<Event>> searchParams, Pageable pageable) {
@@ -56,8 +57,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event update(Event event) {
-        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+    public Event update(Event event, Long id) {
+        Optional<Event> existingEvent = eventRepository.findById(id);
         if (existingEvent.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
@@ -68,6 +69,7 @@ public class EventServiceImpl implements EventService {
         updatedEvent.setCapacity(event.getCapacity());
         updatedEvent.setReservedSeats(event.getReservedSeats());
         updatedEvent.setImageUrl(event.getImageUrl());
+        updatedEvent.setPrice(event.getPrice());
         updatedEvent.setEventType(event.getEventType());
         updatedEvent.setEventStatus(event.getEventStatus());
         return eventRepository.save(updatedEvent);
@@ -82,34 +84,87 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event validateEvent(Event event, User user) {
+    public Event validateEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        if (!userRepository.existsById(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        if (!user.getRole().equals(UserRole.ADMIN)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
-        }
-        event.setEventStatus(EventStatus.ACCEPTED);
-        update(event);
-        return event;
+        Event updatedEvent = existingEvent.get();
+        updatedEvent.setEventStatus(EventStatus.ACCEPTED);
+        eventRepository.save(updatedEvent);
+        return updatedEvent;
     }
 
     @Override
-    public Event refuseEvent(Event event, User user) {
+    public Event refuseEvent(Event event) {
         if (!eventRepository.existsById(event.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        if (!userRepository.existsById(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
-        if (!user.getRole().equals(UserRole.ADMIN)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to access this resource");
-        }
+        Event updatedEvent = existingEvent.get();
         event.setEventStatus(EventStatus.REJECTED);
-        update(event);
-        return event;
+        eventRepository.save(updatedEvent);
+        return updatedEvent;
+    }
+
+    @Override
+    public Page<Event> findAllByDate(int year, int month, Pageable pageable) {
+        return eventRepository.findByDate(year, month, pageable);
+    }
+
+    @Override
+    public Event planifyEvent(Event event, LocalDateTime date) {
+        Optional<Event> existingEvent = eventRepository.findById(event.getId());
+        if (existingEvent.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+        Event updatedEvent = existingEvent.get();
+        updatedEvent.setDate(date);
+        eventRepository.save(updatedEvent);
+        return updatedEvent;
+    }
+
+    @Override
+    public Double GetPourcentage(Long eventId) {
+        Double pourcentage = eventRepository.getRatioOfReservedSeats(eventId);
+        if (!eventRepository.existsById(eventId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        } else if (pourcentage == 0){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tickets reserved for this event");
+        }
+        return pourcentage;
+    }
+
+    public Double getRatioOfReservedSeats(Long eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+        return eventRepository.getRatioOfReservedSeats(eventId);
+    }
+
+    public Double getPopularity(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+        if (event.getReservedSeats() < event.getCapacity()) {
+            return 0.0; // Popularité = 0 si l'événement n'est pas encore complet
+        }
+
+        LocalDateTime eventCreatedAt = eventRepository.getCreationDate(eventId);
+        LocalDateTime lastTicketCreatedAt = ticketRepository.getCreationDate(eventId);
+
+        if (eventCreatedAt == null || lastTicketCreatedAt == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not retrieve timestamps");
+        }
+
+        long daysToFill = Duration.between(eventCreatedAt, lastTicketCreatedAt).toDays();
+
+        return 1.0 / (daysToFill + 1);
     }
 }

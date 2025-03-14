@@ -3,6 +3,8 @@ package org.seba.eventrack.api.controllers;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.security.dtos.UserSessionDTO;
+import org.seba.eventrack.api.models.user.dtos.UserDTO;
+import org.seba.eventrack.api.models.user.forms.UserForm;
 import org.seba.eventrack.bll.services.UserService;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
@@ -23,6 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<CustomPage<UserSessionDTO>> getAllUsers(
             @RequestParam Map<String, String> params,
@@ -43,26 +46,41 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/{email}")
     public ResponseEntity<UserSessionDTO> getUserByEmail(@PathVariable String email) {
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(UserSessionDTO.fromUser(user));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserSessionDTO> createUser(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
+    public ResponseEntity<UserSessionDTO> createUser(@RequestBody UserForm user) {
+        User savedUser = userService.saveUser(user.toUser());
         return ResponseEntity.ok(UserSessionDTO.fromUser(savedUser));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserSessionDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{email}")
+    public ResponseEntity<UserSessionDTO> updateUser(@PathVariable String email, @RequestBody UserForm user) {
+        User updatedUser = userService.updateUser(user.toUser(), email);
         return ResponseEntity.ok(UserSessionDTO.fromUser(updatedUser));
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+        Long id = userService.getUserByEmail(email).getId();
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{email}/update-two-factor")
+    public ResponseEntity<Void> updateUser(@RequestParam String email, @RequestParam boolean twoFactor) {
+        userService.setTwoFactorEnabled(email, twoFactor);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

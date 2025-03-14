@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.exceptions.user.UserAlreadyExistExeption;
 import org.seba.eventrack.bll.exceptions.user.UserNotFoundException;
 import org.seba.eventrack.bll.services.UserService;
+import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TicketRepository ticketRepository;
 
     @Override
     public Page<User> getUsers(List<SearchParam<User>> searchParams, Pageable pageable) {
@@ -55,8 +58,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        User existingUser = userRepository.findById(user.getId())
+    public User updateUser(User user, String email) {
+        User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + user.getId()));
 
         if (!existingUser.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
@@ -73,9 +76,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
+        ticketRepository.deleteByParticipant(user);
         userRepository.delete(user);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
+    }
+
+    @Override
+    public void setTwoFactorEnabled(String email, Boolean bool) {
+        User existingUser = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException(HttpStatus.NOT_FOUND, "User not found with email: " + email)
+        );
+        existingUser.setTwoFactorEnabled(bool);
+        userRepository.save(existingUser);
     }
 }

@@ -2,6 +2,7 @@ package org.seba.eventrack.dl.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.seba.eventrack.api.models.user.dtos.UserDTO;
 import org.seba.eventrack.dl.entities.base.BaseEntity;
 import org.seba.eventrack.dl.enums.NotificationPreference;
 import org.seba.eventrack.dl.enums.PaymentMethod;
@@ -59,7 +60,16 @@ public class User extends BaseEntity<Long> implements UserDetails {
     @Enumerated(EnumType.STRING)
     private PaymentMethod preferredPaymentMethod = PaymentMethod.NONE;
 
-    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
+    @Column
+    private String otp;  // Stocke le code OTP
+
+    @Column
+    private LocalDateTime otpExpiration; // Expiration de l'OTP
+
+    @Column
+    private boolean twoFactorEnabled;
+
+    @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Event> organizedEvents;
 
     public User() {

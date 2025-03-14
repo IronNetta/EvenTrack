@@ -1,10 +1,10 @@
 package org.seba.eventrack.bll.services.impls;
 
-import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.PayPalRESTException;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
-import org.seba.eventrack.api.configs.paypal.PaypalConfiguration;
 import org.seba.eventrack.api.models.mails.dtos.EmailsDTO;
+import org.seba.eventrack.api.models.ticket.dtos.TicketDto;
 import org.seba.eventrack.bll.services.TicketService;
 import org.seba.eventrack.bll.services.mails.EmailService;
 import org.seba.eventrack.bll.services.payment.PaymentService;
@@ -15,6 +15,7 @@ import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.dal.repositories.EventRepository;
 import org.seba.eventrack.dal.repositories.TicketRepository;
 import org.seba.eventrack.dal.repositories.UserRepository;
+import org.seba.eventrack.dl.enums.TicketType;
 import org.seba.eventrack.il.requests.SearchParam;
 import org.seba.eventrack.il.specification.SearchSpecification;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,6 @@ public class TicketServiceImpl implements TicketService {
     private final UserRepository userRepository;
     private final PaymentService paymentService;
     private final QRCodeService qrCodeService;
-    private final PaypalConfiguration paypalConfiguration;
     private final EmailService emailService;
 
     @Override
@@ -54,7 +54,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public String bookTicket(Long eventId, Long userId) {
+    public String bookTicket(Long eventId, Long userId, TicketType ticketType) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         User user = userRepository.findById(userId)
@@ -64,13 +64,68 @@ public class TicketServiceImpl implements TicketService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tickets available for this event");
         }
 
-        return paymentService.createPayment(event.getPrice(), "USD", userId, eventId);
+        Double price = event.getTicketPrice(ticketType);
+        if (price == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ticket type or price not set");
+        }
+
+        Ticket ticket = new Ticket();
+        ticket.setPaid(true);
+        ticket.setEvent(event);
+        ticket.setParticipant(user);
+        ticket.setType(ticketType);
+        String qrCodePath = qrCodeService.generateQrCode(ticket.getId());
+        ticket.setQrCodeUrl(qrCodePath);
+        emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
+
+        return paymentService.createPayment(price, "USD", userId, eventId, ticketType.name());
     }
 
     @Override
+    public Ticket confirmTicket(String paymentId) throws StripeException {
+        // Vérifie le paiement Stripe
+        PaymentIntent payment = paymentService.getPaymentDetails(paymentId);
+        if (!"succeeded".equals(payment.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
+        }
+
+        // Récupérer les metadata Stripe contenant userId et eventId
+        Long userId = Long.parseLong(payment.getMetadata().get("userId"));
+        Long eventId = Long.parseLong(payment.getMetadata().get("eventId"));
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Création du ticket
+        Ticket ticket = new Ticket();
+        ticket.setPaid(true);
+        ticket.setEvent(event);
+        ticket.setParticipant(user);
+
+        String typeStr = payment.getMetadata().get("ticketType");
+        TicketType ticketType = TicketType.valueOf(typeStr);
+        ticket.setType(ticketType);
+
+        // Génération du QR Code
+        String qrCodePath = qrCodeService.generateQrCode(ticket.getId());
+        ticket.setQrCodeUrl(qrCodePath);
+
+        // Mise à jour du nombre de places réservées
+        event.setReservedSeats(event.getReservedSeats() + 1);
+        eventRepository.save(event);
+
+        // Envoi du mail avec le ticket
+        emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
+
+        return ticketRepository.save(ticket);
+    }
+
+    /*@Override
     public Ticket confirmTicket(String paymentId) throws PayPalRESTException {
         if (paymentService.validatePayment(paymentId)) {
-            Payment payment = Payment.get(paypalConfiguration.getAPIContext(), paymentId);
+            Payment payment = paymentService.getPaymentDetails(paymentId);
 
             String description = payment.getTransactions().get(0).getDescription();
             String[] parts = description.split(": ");
@@ -93,15 +148,17 @@ public class TicketServiceImpl implements TicketService {
             event.setReservedSeats(event.getReservedSeats() + 1);
             eventRepository.save(event);
 
+            emailService.sendSimpleMail(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket"));
             emailService.sendMailWithAttachment(new EmailsDTO(user.getEmail(), "Ticket Confirmation", "Ticket", qrCodePath));
             return ticketRepository.save(ticket);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment validation failed");
-    }
+    }*/
     @Override
-    public Ticket findById(Long id) {
-        return ticketRepository.findById(id)
+    public TicketDto findById(Long id) {
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+        return TicketDto.fromTicket(ticket);
     }
 
     @Override

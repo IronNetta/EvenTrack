@@ -9,11 +9,13 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - ✅ Inscription et connexion avec **Spring Security + JWT**
 - ✅ Rôles : **Admin, Organisateur, Participant**
 - ✅ Mise à jour du profil utilisateur
+- ✅ Authentification à 2 facteurs
 
 ### 2. Gestion des événements
 - ✅ CRUD sur les événements (titre, description, date, lieu, capacité)
 - ✅ Catégorisation des événements (concert, conférence, sport, etc.)
 - ✅ Ajout d'une image de couverture
+- ✅ Tarification multiple des événements
 
 ### 3. Réservation et gestion des billets
 - ✅ Réservation d'un billet pour un événement
@@ -31,35 +33,84 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 - ✅ Rappel automatique par **email/SMS** avant l'événement
 
 ### 6. Modération et gestion des événements
-- Validation ou refus d'un événement par un admin
-- Suppression d'événements frauduleux
+- ✅ Validation ou refus d'un événement par un admin
+- ✅ Suppression d'événements frauduleux
 
 ### 7. Statistiques & Dashboard (optionnel)
-- Nombre de participants à un événement
-- Taux de remplissage des événements
-- Popularité des événements
+- ✅ Nombre de participants à un événement
+- ✅ Taux de remplissage des événements
+- ✅ Popularité des événements
+- (Méhtodes existes mais doivent être utilisées)
 
 ### 8. Gestion des plannings
-- Planification des événements
-- Affichage d'un calendrier avec les événements
+- ✅ Planification des événements
+- ✅ Affichage d'un calendrier avec les événements
 
-## Endpoints principaux (REST API)
+### 9. Gestion des messages
+- ✅ Envoi de messages entre utilisateurs
+- ✅ Marquage des messages comme lus
+- ✅ Suppression de messages
+- ✅ Affichage des messages par utilisateur
 
-| Méthode | Endpoint                  | Description                             |
-|---------|---------------------------|-----------------------------------------|
-| POST    | `/auth/register`          | Inscription d’un utilisateur            |
-| POST    | `/auth/login`             | Connexion et récupération du token      |
-| GET     | `/events`                 | Lister tous les événements              |
-| GET     | `/events/{id}`            | Récupérer un événement spécifique       |
-| POST    | `/events`                 | Créer un événement (organisateur)       |
-| PUT     | `/events/{id}`            | Modifier un événement                   |
-| DELETE  | `/events/{id}`            | Supprimer un événement                  |
-| POST    | `/events/{id}/reserve`    | Réserver un billet                      |
-| GET     | `/users/{id}/tickets`     | Voir les billets d’un utilisateur       |
-| DELETE  | `/tickets/{id}`           | Annuler une réservation                 |
-| POST    | `/events/{id}/approve`    | Approuver un événement (admin)          |
-| POST    | `/events/{id}/reject`     | Refuser un événement (admin)            |
+# API Endpoints
 
+## AuthController
+
+| Méthode | Endpoint       | Description                     | Rôles/Requis |
+|---------|--------------|---------------------------------|--------------|
+| POST    | `/auth/register` | Inscription d'un utilisateur  | Anonyme      |
+| POST    | `/auth/login`    | Connexion d'un utilisateur    | Anonyme      |
+
+## PaymentController
+
+| Méthode | Endpoint                             | Description                           | Rôles/Requis |
+|---------|-------------------------------------|-------------------------------------|--------------|
+| POST    | `/api/payments/create-checkout-session` | Création d'une session de paiement Stripe | - |
+| POST    | `/api/payments/webhook`            | Gestion du webhook Stripe           | - |
+
+## EventController
+
+| Méthode | Endpoint                  | Description                         | Rôles/Requis        |
+|---------|--------------------------|-----------------------------------|--------------------|
+| GET     | `/events`                | Récupère tous les événements      | Public             |
+| GET     | `/events/{id}`           | Récupère un événement par ID      | Public             |
+| POST    | `/events`                | Créer un événement               | ADMIN, ORGANIZER   |
+| PUT     | `/events/{id}`           | Met à jour un événement          | ADMIN, ORGANIZER   |
+| DELETE  | `/events/{id}`           | Supprime un événement            | ADMIN              |
+| PUT     | `/events/{id}/accept`    | Accepte un événement             | ADMIN              |
+| PUT     | `/events/{id}/reject`    | Rejette un événement             | ADMIN              |
+| GET     | `/events/planning`       | Récupère le planning des événements | Authentifié   |
+| PUT     | `/events/{id}/planify`   | Planifie un événement            | ADMIN              |
+| GET     | `/events/popularity/{id}` | Obtient la popularité d'un événement | ORGANIZER     |
+
+## MessageController
+
+| Méthode | Endpoint            | Description                  | Rôles/Requis |
+|---------|--------------------|------------------------------|--------------|
+| POST    | `/messages/send`   | Envoie un message            | Authentifié  |
+| GET     | `/messages/received` | Récupère les messages reçus  | Authentifié  |
+| GET     | `/messages/sent`   | Récupère les messages envoyés | Authentifié  |
+| PUT     | `/messages/{id}/read` | Marque un message comme lu  | Authentifié  |
+| DELETE  | `/messages/{id}`   | Supprime un message         | Authentifié  |
+
+## TicketController
+
+| Méthode | Endpoint          | Description                | Rôles/Requis |
+|---------|------------------|----------------------------|--------------|
+| GET     | `/tickets`       | Récupère tous les tickets  | Authentifié  |
+| POST    | `/tickets/book`  | Réserve un ticket          | Authentifié  |
+| GET     | `/tickets/{id}`  | Récupère un ticket par ID  | Authentifié  |
+| DELETE  | `/tickets/cancel/{id}` | Annule un ticket | Authentifié |
+
+## UserController
+
+| Méthode | Endpoint         | Description                  | Rôles/Requis |
+|---------|-----------------|------------------------------|--------------|
+| GET     | `/user`         | Récupère tous les utilisateurs | ADMIN        |
+| GET     | `/user/{email}` | Récupère un utilisateur par email | ADMIN        |
+| POST    | `/user`         | Crée un utilisateur          | ADMIN        |
+| PUT     | `/user/{email}` | Met à jour un utilisateur    | ADMIN        |
+| DELETE  | `/user/{email}` | Supprime un utilisateur      | ADMIN        |
 
 ## Installation
 ### Prérequis
@@ -70,29 +121,33 @@ EvenTrack est une API REST permettant la gestion complète d'événements avec g
 
 ### Installation du projet
 ```sh
-git clone https://github.com/IronNetta/EventFlow.git
-cd EventFlow
+git clone https://github.com/IronNetta/EvenTrack.git
+cd EvenTrack
 mvn clean install
 ```
 
 ### Configuration
-Modifier le fichier **application.yml** avec vos propres valeurs :
+Modifier le fichier **application.properties** avec vos propres valeurs :
 ```properties
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/eventrack
-    username: Username
-    password: Password
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-server:
-  port: 8080
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventrack
+spring.datasource.username=username
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+stripe.secretKey=your_stripe_secret_key
+
+spring.mail.host=smtp_host
+spring.mail.port=your_smtp_port
+spring.mail.username=your_email
+spring.mail.password=your_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+server.port=your_port
 ```
 
 ## Lancement
@@ -134,13 +189,18 @@ Content-Type: application/json
 POST /api/events
 Authorization: Bearer {token}
 Content-Type: application/json
+
 {
   "title": "Conférence Tech",
   "description": "Une conférence sur les nouvelles technologies",
-  "date": "2025-06-15",
   "location": "Paris, France",
   "capacity": 200,
-  "category": "Conférence"
+  "imageUrl": "string",
+  "eventType": "CONCERT",
+  "ticketPrices": {
+    "STANDARD": 50,
+    "VIP": 100,
+    "YOUNG": 30
 }
 ```
 
@@ -148,6 +208,12 @@ Content-Type: application/json
 La documentation complète est disponible via **Swagger** :
 - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-## Licence
-MIT License - Voir le fichier `LICENSE` pour plus de détails.
+## Collaboration
+Projet developpé chez Technifutur en collaboration avec : 
+- [Barnabé Dussart](https://github.com/AtomDus)
+- [Daniel Hajdini](https://github.com/DanHajdini)
+
+## Presentation
+Visualisation des slides de presentation:
+[Par ici](https://docs.google.com/presentation/d/1oW73jsgTMPvrz-eO1IHosnfC_in_fSuCLFi3jHyT2sM/edit?usp=sharing)
 

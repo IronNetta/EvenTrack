@@ -1,5 +1,7 @@
 package org.seba.eventrack.bll.services;
 
+import org.seba.eventrack.api.models.event.dtos.EventDto;
+import org.seba.eventrack.api.models.event.forms.EventForm;
 import org.seba.eventrack.dl.entities.Event;
 import org.seba.eventrack.dl.entities.User;
 import org.seba.eventrack.il.requests.SearchParam;
@@ -9,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
@@ -19,11 +22,21 @@ public interface EventService {
 
     Event findById(Long id);
 
-    Event update(Event event);
+    Event update(Event event, Long id);
 
     void deleteById(Long id);
 
-    Event validateEvent(Event event, User user);
+    Event validateEvent(Event event);
 
-    Event refuseEvent(Event event, User user);
+    Event refuseEvent(Event event);
+
+    Page<Event> findAllByDate(int year, int month, Pageable pageable);
+
+    Event planifyEvent(Event event, LocalDateTime dateTime);
+
+    Double GetPourcentage(Long eventId);
+
+    Double getRatioOfReservedSeats(Long eventId);
+
+    Double getPopularity(Long eventId);
 }
