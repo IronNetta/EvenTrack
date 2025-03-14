@@ -7,6 +7,7 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.bll.services.TicketService;
 import org.seba.eventrack.dl.entities.Ticket;
@@ -22,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
+@Tag(name = "Payment", description = "Endpoints pour la gestion des paiements")
 public class PaymentController {
 
     /*private final Map<String, PaymentService> paymentServices;

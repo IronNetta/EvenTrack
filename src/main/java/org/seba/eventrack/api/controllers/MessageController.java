@@ -1,5 +1,6 @@
 package org.seba.eventrack.api.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.message.dtos.MessageDTO;
 import org.seba.eventrack.api.models.user.dtos.UserDTO;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/messages")
 @RequiredArgsConstructor
+@Tag(name = "Messages", description = "Endpoints pour la gestion des messages")
 public class MessageController {
 
     private final MessageService messageService;

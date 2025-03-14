@@ -1,6 +1,8 @@
 package org.seba.eventrack.api.controllers;
 
 import com.paypal.base.rest.PayPalRESTException;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.ticket.dtos.TicketDto;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tickets")
+@Tag(name = "Tickets", description = "Endpoints pour la gestion des tickets")
 public class TicketController {
 
     private final TicketService ticketService;
