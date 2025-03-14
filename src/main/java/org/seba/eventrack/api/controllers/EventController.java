@@ -1,5 +1,6 @@
 package org.seba.eventrack.api.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.event.dtos.EventDto;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/events")
+@Tag(name = "Events", description = "Endpoints pour les événements")
 public class EventController {
 
     private final EventService eventService;

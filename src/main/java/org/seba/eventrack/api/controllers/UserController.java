@@ -1,5 +1,6 @@
 package org.seba.eventrack.api.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.seba.eventrack.api.models.CustomPage;
 import org.seba.eventrack.api.models.security.dtos.UserSessionDTO;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Tag(name = "User", description = "Endpoints pour la gestion des utilisateurs")
 public class UserController {
 
     private final UserService userService;

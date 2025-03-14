@@ -21,7 +21,7 @@ public class OpenApiConfig {
                         .description("API pour l'événementiel.")
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("Sebastien")
+                                .name("Sébastien")
                                 .email("delaet.sebastien22@gmail.com"))
                         .license(new License()
                                 .name("Apache 2.0")
