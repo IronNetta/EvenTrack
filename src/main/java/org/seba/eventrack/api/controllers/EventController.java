@@ -33,7 +33,7 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<CustomPage<EventDto>> getAllEvents(
-            @RequestParam Map<String, String> params,
+            @RequestParam (required = false) Map<String, String> params,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sort
@@ -119,7 +119,7 @@ public class EventController {
         return ResponseEntity.ok(EventDto.fromEvent(eventService.planifyEvent(eventService.findById(id), date)));
     }
 
-    @PreAuthorize("hasAuthority('ORGANIZER')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ORGANIZER')")
     @GetMapping("/popularity/{id}")
     public ResponseEntity<Double> getPopularity(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getPopularity(id));

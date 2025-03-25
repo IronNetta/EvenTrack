@@ -30,10 +30,10 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<CustomPage<UserSessionDTO>> getAllUsers(
-            @RequestParam Map<String, String> params,
+            @RequestParam(required = false) Map<String, String> params,
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "lastName") String sort
+            @RequestParam(required = false, defaultValue = "username") String sort
 
     ) {
         List<SearchParam<User>> searchParams = SearchParam.create(params);
